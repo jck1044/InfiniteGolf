@@ -34,7 +34,7 @@ public class BallView {
     }
 
     public void render(float dt) {
-        if (this.model.getMovementVector().x != 0) { //ball is moving --> should be rotating
+        if (this.model.getMovementVector().x != 0 || this.model.getMovementVector().y != 0) { //ball is moving --> should be rotating
             int nextAnimationSequence = getNextBallRotation(currentAnimationSequence);
             Array<Sprite> spriteList = animationFrames.get(nextAnimationSequence);
             currentAnimation = new Animation<>(this.animationFrameDuration, spriteList);

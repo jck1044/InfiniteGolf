@@ -18,6 +18,14 @@ public class BallController {
         this.model.setMovementVector(new Vector2(1, 0));
     }
 
+    public void moveUp() {
+        this.model.setMovementVector(new Vector2(0, 1));
+    }
+
+    public void moveDown() {
+        this.model.setMovementVector(new Vector2(0, -1));
+    }
+
     public void stop() {
         this.model.setMovementVector(new Vector2(0, 0));
     }

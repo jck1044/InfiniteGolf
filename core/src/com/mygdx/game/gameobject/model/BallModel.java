@@ -4,7 +4,7 @@ import com.badlogic.gdx.math.Vector2;
 
 public class BallModel {
     private Vector2 position; // vector for x, y location of the ship in the game world
-    private float speed = 0F;
+    private float speed = 200F;
     private Vector2 movementVector = new Vector2(0, 0);
 
     public BallModel(Vector2 position) {

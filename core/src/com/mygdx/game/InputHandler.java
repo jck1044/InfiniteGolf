@@ -18,11 +18,19 @@ public class InputHandler implements InputProcessor {
             this.controller.moveLeft();
             return true;
         }
-
         if (keycode == Input.Keys.RIGHT) {
             this.controller.moveRight();
             return true;
         }
+        if (keycode == Input.Keys.UP) {
+            this.controller.moveUp();
+            return true;
+        }
+        if (keycode == Input.Keys.DOWN) {
+            this.controller.moveDown();
+            return true;
+        }
+
 
         return false;
     }
@@ -30,7 +38,7 @@ public class InputHandler implements InputProcessor {
     @Override
     public boolean keyUp(int keycode) {
 
-        if (keycode == Input.Keys.LEFT || keycode == Input.Keys.RIGHT) {
+        if (keycode == Input.Keys.LEFT || keycode == Input.Keys.RIGHT || keycode == Input.Keys.UP || keycode == Input.Keys.DOWN) {
             this.controller.stop();
             return true;
         }
