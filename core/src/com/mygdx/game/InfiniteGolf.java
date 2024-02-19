@@ -30,7 +30,7 @@ public class InfiniteGolf extends ApplicationAdapter {
     @Override
     public void create() {
         batch = new SpriteBatch();
-        playerBall = new BallModel(new Vector2(100, 100));
+        playerBall = new BallModel(new Vector2(100, 100), 62F);
         playerBallView = new BallView(playerBall, batch);
         playerController = new BallController(playerBall);
         this.backgroundObjects = new Array<>();
