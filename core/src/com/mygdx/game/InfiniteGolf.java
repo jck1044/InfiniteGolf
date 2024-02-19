@@ -9,9 +9,11 @@ import com.badlogic.gdx.utils.ScreenUtils;
 import com.mygdx.game.gameobject.controller.BallController;
 import com.mygdx.game.gameobject.model.BackgroundElement;
 import com.mygdx.game.gameobject.model.BallModel;
+import com.mygdx.game.gameobject.model.GrassModel;
 import com.mygdx.game.gameobject.view.BackgroundElementView;
 import com.mygdx.game.gameobject.view.BallView;
 import com.mygdx.game.gameobject.view.GameObjectView;
+import com.mygdx.game.gameobject.view.GrassView;
 
 import java.util.Map;
 import java.util.SortedMap;
@@ -30,7 +32,7 @@ public class InfiniteGolf extends ApplicationAdapter {
     @Override
     public void create() {
         batch = new SpriteBatch();
-        playerBall = new BallModel(new Vector2(100, 100), 62F);
+        playerBall = new BallModel(new Vector2(100, 200), 62F);
         playerBallView = new BallView(playerBall, batch);
         playerController = new BallController(playerBall);
         this.backgroundObjects = new Array<>();
@@ -39,6 +41,7 @@ public class InfiniteGolf extends ApplicationAdapter {
         this.gameObjectViews.put(FOREGROUND_LAYER, foregroundViews);
         Gdx.input.setInputProcessor(new InputHandler(playerController));
         this.createBackdrop();
+        this.createGrass();
     }
 
     @Override
@@ -78,12 +81,17 @@ public class InfiniteGolf extends ApplicationAdapter {
         this.addToGameObjectViews(backdropView);
     }
 
+    private void createGrass() {
+        GrassModel grassModel = new GrassModel(new Vector2(), new Vector2(1024F, 128F), (short)(3000));
+        GrassView grassView = new GrassView(grassModel, batch);
+        this.addToGameObjectViews(grassView);
+    }
+
     private void addToGameObjectViews(GameObjectView view) {
         short layer = view.getLayer();
         if (!this.gameObjectViews.containsKey(layer)) {
             this.gameObjectViews.put(layer, new Array<>());
         }
         this.gameObjectViews.get(layer).add(view);
-
     }
 }
