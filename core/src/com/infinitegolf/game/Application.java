@@ -7,6 +7,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.maps.MapProperties;
 import com.badlogic.gdx.maps.tiled.TiledMap;
@@ -71,7 +72,13 @@ public class Application extends ApplicationAdapter {
 		tmr.render();
 
 		batch.begin();
-		batch.draw(ballTexture,golfBall.getPosition().x * PPM - (ballTexture.getWidth()/2),golfBall.getPosition().y * PPM - (ballTexture.getHeight()/2));
+		Sprite ballSprite = new Sprite(ballTexture);
+		float angle = golfBall.getAngle() * 45;
+		ballSprite.rotate(angle);
+		ballSprite.setX(golfBall.getPosition().x * PPM - (ballTexture.getWidth()/2));
+		ballSprite.setY(golfBall.getPosition().y * PPM - (ballTexture.getHeight()/2));
+		ballSprite.draw(batch);
+//		batch.draw(ballTexture,golfBall.getPosition().x * PPM - (ballTexture.getWidth()/2),golfBall.getPosition().y * PPM - (ballTexture.getHeight()/2));
 		batch.end();
 
 		b2dr.render(world, camera.combined.scl(PPM));
