@@ -12,6 +12,7 @@ import com.mygdx.game.gameobject.model.BackgroundElement;
 import com.mygdx.game.gameobject.model.BallModel;
 import com.mygdx.game.gameobject.view.BallView;
 import com.mygdx.game.gameobject.view.GameObjectView;
+import com.mygdx.game.utils.Assets;
 
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -31,6 +32,8 @@ public class Menu extends Scene {
 
     @Override
     public void initScene() {
+        Assets.init();
+        this.loadAssets();
         float w = Gdx.graphics.getWidth();
         float h = Gdx.graphics.getHeight();
         camera = new OrthographicCamera(30, 30 * (h / w));
@@ -42,5 +45,9 @@ public class Menu extends Scene {
     @Override
     public void updateScene(float dt) {
 
+    }
+
+    private void loadAssets() {
+        Assets.loadAll();
     }
 }

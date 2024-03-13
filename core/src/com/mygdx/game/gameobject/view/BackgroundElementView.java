@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.mygdx.game.gameobject.model.BackgroundElement;
+import com.mygdx.game.utils.Assets;
 
 
 public class BackgroundElementView extends GameObjectView {
@@ -14,7 +15,7 @@ public class BackgroundElementView extends GameObjectView {
     public BackgroundElementView(BackgroundElement model, SpriteBatch batch) {
         super(batch);
         this.model = model;
-        this.staticImg = new Sprite(new Texture("textures/sky.jpeg"));
+        this.staticImg = new Sprite(Assets.getTexture("textures/sky.jpg"));
     }
 
     public void render(float dt) {

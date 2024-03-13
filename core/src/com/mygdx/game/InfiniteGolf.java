@@ -16,13 +16,6 @@ import com.mygdx.game.utils.Assets;
 import java.util.SortedMap;
 
 public class InfiniteGolf extends Game {
-    SpriteBatch batch;
-    BallModel playerBall;
-    BallView playerBallView;
-    BallController playerController;
-    Array<BackgroundElement> backgroundObjects;
-    SortedMap<Short, Array<GameObjectView>> gameObjectViews;
-
 
     @Override
     public void create() {

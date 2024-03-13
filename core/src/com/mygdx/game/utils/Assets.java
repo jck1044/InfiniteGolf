@@ -50,17 +50,6 @@ public class Assets {
         return tex;
     }
 
-
-    public static Sound getSound(String name)
-    {
-        Sound s = null;
-        if(assetManager.isLoaded(name))
-        {
-            s = assetManager.get(name, Sound.class);
-        }
-        return s;
-    }
-
     public static void addTexture(String name)
     {
         assetManager.load(name, Texture.class);
@@ -69,11 +58,6 @@ public class Assets {
     public static void addTextureAtlas(String name)
     {
         assetManager.load(name, TextureAtlas.class);
-    }
-
-    public static void addSound(String audioName)
-    {
-        assetManager.load(audioName, Sound.class);
     }
 
     public static void dispose()

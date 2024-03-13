@@ -7,8 +7,9 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.gameobject.model.BallModel;
+import com.mygdx.game.utils.Assets;
 
-public class BallView {
+public class BallView extends GameObjectView {
     private final BallModel model;
     private final SpriteBatch batch;
     private final Array<Array<Sprite>> animationFrames;
@@ -22,9 +23,10 @@ public class BallView {
     final int rotationDegrees = 50;
 
     public BallView(BallModel model, SpriteBatch batch) {
+        super(batch);
         this.model = model;
         this.batch = batch;
-        this.textureAtlas = new TextureAtlas("textures/ball.txt");
+        this.textureAtlas = Assets.getTextureAtlas("textures/ball.txt");
         this.animationFrames = new Array<>();
         animationFrames.add(textureAtlas.createSprites("ball"));
         currentAnimation = new Animation<>(this.animationFrameDuration, animationFrames.get(0));
@@ -43,7 +45,9 @@ public class BallView {
         batch.draw(currentAnimationFrame, this.model.getPosition().x, this.model.getPosition().y, this.model.getRadius(), this.model.getRadius(), this.model.getRadius() * 2, this.model.getRadius() * 2, 1, 1, this.rotationAngle);
     }
 
-    public void dispose() {
-        this.textureAtlas.dispose();
+    public short getLayer() {
+        return this.model.getLayer();
     }
+
+
 }

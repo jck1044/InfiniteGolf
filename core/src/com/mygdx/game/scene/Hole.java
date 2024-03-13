@@ -15,6 +15,7 @@ import com.mygdx.game.gameobject.view.BackgroundElementView;
 import com.mygdx.game.gameobject.view.BallView;
 import com.mygdx.game.gameobject.view.GameObjectView;
 import com.mygdx.game.gameobject.view.GrassView;
+import com.mygdx.game.utils.Assets;
 
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -27,14 +28,14 @@ public class Hole extends Scene {
     BallModel playerBall;
     BallView playerBallView;
     BallController playerController;
-    Array<BackgroundElement> backgroundObjects;
-    SortedMap<Short, Array<GameObjectView>> gameObjectViews;
     public Hole(Game game) { // Need to add a parameter for the map file
         this.game = game;
     }
 
     @Override
     public void initScene() {
+        Assets.init();
+        this.loadAssets();
         float w = Gdx.graphics.getWidth();
         float h = Gdx.graphics.getHeight();
         camera = new OrthographicCamera(30, 30 * (h / w));
@@ -42,7 +43,7 @@ public class Hole extends Scene {
         camera.update();
 
         batch = new SpriteBatch();
-        playerBall = new BallModel(new Vector2(100, 200), 62F);
+        playerBall = new BallModel(new Vector2(100, 200), 62F, (short) 0);
         playerBallView = new BallView(playerBall, batch);
         playerController = new BallController(playerBall);
         this.backgroundObjects = new Array<>();
@@ -80,6 +81,12 @@ public class Hole extends Scene {
             this.gameObjectViews.put(layer, new Array<>());
         }
         this.gameObjectViews.get(layer).add(view);
+    }
+
+    private void loadAssets() {
+        Assets.addTexture("textures/sky.jpg");
+        Assets.addTextureAtlas("textures/ball.txt");
+        Assets.loadAll();
     }
 
 }
