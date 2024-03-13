@@ -73,7 +73,7 @@ public class Application extends ApplicationAdapter {
 
 		batch.begin();
 		Sprite ballSprite = new Sprite(ballTexture);
-		float angle = golfBall.getAngle() * 45;
+		float angle = golfBall.getAngle() * (180/(float)Math.PI);
 		ballSprite.rotate(angle);
 		ballSprite.setX(golfBall.getPosition().x * PPM - (ballTexture.getWidth()/2));
 		ballSprite.setY(golfBall.getPosition().y * PPM - (ballTexture.getHeight()/2));
