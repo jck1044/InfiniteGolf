@@ -96,10 +96,10 @@ public class Application extends ApplicationAdapter {
 
 
         Sprite arrowSprite = new Sprite(arrowTexture);
-        arrowSprite.setX(golfBall.getPosition().x * PPM - ((ballTexture.getWidth() * (arrowSize / golfBallSize)) / 2));
+        arrowSprite.setX(golfBall.getPosition().x * PPM);
         arrowSprite.setY(golfBall.getPosition().y * PPM - ((ballTexture.getHeight() * (arrowSize / golfBallSize)) / 2));
         arrowSprite.setSize(arrowSize, arrowSize);
-        arrowSprite.setOrigin((golfBall.getPosition().x + ((ballTexture.getWidth() * (powerBallSize / golfBallSize)))), (golfBall.getPosition().y + ((ballTexture.getHeight() * (powerBallSize / golfBallSize)) / 2)));
+        arrowSprite.setOrigin(0, golfBallSize);
         arrowSprite.setRotation(arrowAngle);
         arrowSprite.draw(batch);
 
@@ -139,6 +139,12 @@ public class Application extends ApplicationAdapter {
             arrowAngle--;
             System.out.println(arrowAngle);
 //            horizontalForce += 1;
+        }
+        if (Gdx.input.isKeyPressed((Input.Keys.UP))) {
+            horizontalForce += 1;
+        }
+        if (Gdx.input.isKeyPressed((Input.Keys.DOWN))) {
+            horizontalForce -= 1;
         }
 //        if (Gdx.input.isKeyJustPressed((Input.Keys.SPACE))) {
 //            golfBall.applyForceToCenter(0, 500, false);
