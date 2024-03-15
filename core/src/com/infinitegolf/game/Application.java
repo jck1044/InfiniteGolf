@@ -38,14 +38,15 @@ public class Application extends ApplicationAdapter {
     private Box2DDebugRenderer b2dr;
     private World world;
     private Body golfBall, platform;
-    private float horizontalForce = 0;
-    private float verticalForce = 0;
+//    private float horizontalForce = 0;
+//    private float verticalForce = 0;
     //    private float power = 0;
     private Boolean powerUp = true;
     private float powerBallSize = golfBallSize;
     private final float arrowSize = 32;
     private float ballAngle = 0;
     private float arrowAngle = 0;
+    private float ballPower = 0;
 
     @Override
     public void create() {
@@ -124,9 +125,31 @@ public class Application extends ApplicationAdapter {
     public void updateGame(float delta) {
         world.step(1 / 60f, 6, 2);
         inputUpdate(delta);
+        updateGolfBallPosition(delta);
         updateCamera(delta);
         tmr.setView(camera);
         batch.setProjectionMatrix(camera.combined);
+    }
+
+    public void updateGolfBallPosition(float delta) {
+        if (!Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
+            if (powerBallSize > golfBallSize) {
+                float horizontalForce = (90 - arrowAngle) * powerBallSize / 3;
+                float verticalForce = getVerticalForce(arrowAngle) * powerBallSize / 5;
+                golfBall.applyForceToCenter(horizontalForce, verticalForce, false);
+                powerBallSize = golfBallSize;
+            }
+        }
+    }
+
+    public static float getVerticalForce(float arrowAngle) {
+        if (arrowAngle == 90) {
+            return 90;
+        } else if (arrowAngle < 90) {
+            return 90 * (arrowAngle / 90);
+        } else {
+            return 90 - (arrowAngle - 90);
+        }
     }
 
     public void inputUpdate(float delta) {
@@ -139,12 +162,6 @@ public class Application extends ApplicationAdapter {
             arrowAngle--;
             System.out.println(arrowAngle);
 //            horizontalForce += 1;
-        }
-        if (Gdx.input.isKeyPressed((Input.Keys.UP))) {
-            horizontalForce += 1;
-        }
-        if (Gdx.input.isKeyPressed((Input.Keys.DOWN))) {
-            horizontalForce -= 1;
         }
 //        if (Gdx.input.isKeyJustPressed((Input.Keys.SPACE))) {
 //            golfBall.applyForceToCenter(0, 500, false);
@@ -174,8 +191,7 @@ public class Application extends ApplicationAdapter {
 //                right = (redBallX - ballX - 5) / 30;
 //            }
 //        } else
-        if (Gdx.input.isKeyPressed(Input.Keys.SPACE) && horizontalForce <= .1) {
-            horizontalForce = 0;
+        if (Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
 //            ballAngle = 0;
             if (powerUp) {
                 if (powerBallSize >= (golfBallSize * 8)) {
@@ -215,7 +231,7 @@ public class Application extends ApplicationAdapter {
 //        }
 
 
-        golfBall.setLinearVelocity(horizontalForce * 5, golfBall.getLinearVelocity().y);
+//        golfBall.setLinearVelocity(horizontalForce * 5, golfBall.getLinearVelocity().y);
     }
 
     public void updateCamera(float delta) {
