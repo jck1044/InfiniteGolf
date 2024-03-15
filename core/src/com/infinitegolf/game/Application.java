@@ -44,7 +44,8 @@ public class Application extends ApplicationAdapter {
     private Boolean powerUp = true;
     private float powerBallSize = golfBallSize;
     private final float arrowSize = 32;
-    private float ballAngle;
+    private float ballAngle = 0;
+    private float arrowAngle = 0;
 
     @Override
     public void create() {
@@ -98,10 +99,8 @@ public class Application extends ApplicationAdapter {
         arrowSprite.setX(golfBall.getPosition().x * PPM - ((ballTexture.getWidth() * (arrowSize / golfBallSize)) / 2));
         arrowSprite.setY(golfBall.getPosition().y * PPM - ((ballTexture.getHeight() * (arrowSize / golfBallSize)) / 2));
         arrowSprite.setSize(arrowSize, arrowSize);
-//        arrowSprite.setOrigin(((golfBall.getPosition().x * PPM) - ((float) ballTexture.getWidth() / 2)), (golfBall.getPosition().y * PPM));
-//        arrowSprite.setOrigin(golfBall.getPosition().x + ((float) ballTexture.getWidth() / 1), golfBall.getPosition().y + ((float) ballTexture.getHeight() / 1));
-//        arrowSprite.rotate90(false);
-//        arrowSprite.rotate90(false);
+        arrowSprite.setOrigin((golfBall.getPosition().x + ((ballTexture.getWidth() * (powerBallSize / golfBallSize)))), (golfBall.getPosition().y + ((ballTexture.getHeight() * (powerBallSize / golfBallSize)) / 2)));
+        arrowSprite.setRotation(arrowAngle);
         arrowSprite.draw(batch);
 
 
@@ -131,12 +130,15 @@ public class Application extends ApplicationAdapter {
     }
 
     public void inputUpdate(float delta) {
-        if (Gdx.input.isKeyPressed((Input.Keys.LEFT))) {
-            horizontalForce -= 1;
-
+        if (Gdx.input.isKeyPressed((Input.Keys.LEFT)) && arrowAngle < 180) {
+            arrowAngle++;
+            System.out.println(arrowAngle);
+//            horizontalForce -= 1;
         }
-        if (Gdx.input.isKeyPressed((Input.Keys.RIGHT))) {
-            horizontalForce += 1;
+        if (Gdx.input.isKeyPressed((Input.Keys.RIGHT)) && arrowAngle > 0) {
+            arrowAngle--;
+            System.out.println(arrowAngle);
+//            horizontalForce += 1;
         }
 //        if (Gdx.input.isKeyJustPressed((Input.Keys.SPACE))) {
 //            golfBall.applyForceToCenter(0, 500, false);
