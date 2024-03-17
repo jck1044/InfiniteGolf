@@ -213,7 +213,7 @@ public class Application extends ApplicationAdapter {
         shape.setRadius(((float) ballProperties.get("height") / 2) / PPM);
         golfBallBody.createFixture(shape, 5.0f);
         shape.dispose();
-        float angularDamping = 100f;
+        float angularDamping = 10f;
         golfBallBody.setAngularDamping(angularDamping);
         return golfBallBody;
     }
