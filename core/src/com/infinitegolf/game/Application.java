@@ -161,21 +161,29 @@ public class Application extends ApplicationAdapter {
 //            System.out.println(arrowAngle);
         }
         if (Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
-            if (powerUp) {
-                if (powerBallSize >= (golfBallSize * 8)) {
-                    powerUp = false;
+            if (isBallStopped()) {
+                if (powerUp) {
+                    if (powerBallSize >= (golfBallSize * 8)) {
+                        powerUp = false;
+                    } else {
+                        powerBallSize *= 1.1f;
+                    }
                 } else {
-                    powerBallSize *= 1.1f;
-                }
-            } else {
-                if (powerBallSize <= (golfBallSize + 1)) {
-                    powerBallSize = golfBallSize;
-                    powerUp = true;
-                } else {
-                    powerBallSize *= 0.9f;
+                    if (powerBallSize <= (golfBallSize + 1)) {
+                        powerBallSize = golfBallSize;
+                        powerUp = true;
+                    } else {
+                        powerBallSize *= 0.9f;
+                    }
                 }
             }
         }
+    }
+
+    private boolean isBallStopped() {
+        boolean isBallOnFloor = golfBall.getPosition().y < 6.32; //fixme: this value is hardcoded for map 1, may not work for others
+        boolean doesBallHaveNoVelocity = golfBall.getLinearVelocity().x <= 0.2 && golfBall.getLinearVelocity().y <= 0.2;
+        return isBallOnFloor && doesBallHaveNoVelocity;
     }
 
     public void updateCamera(float delta) {
