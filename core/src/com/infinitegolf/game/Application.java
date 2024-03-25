@@ -200,8 +200,9 @@ public class Application extends ApplicationAdapter {
     }
 
     private boolean isBallStopped() {
-        boolean isBallOnFloor = golfBall.getPosition().y < 6.32; //fixme: this value is hardcoded for map 1, may not work for others
-        boolean doesBallHaveNoVelocity = golfBall.getLinearVelocity().x <= 0.2 && golfBall.getLinearVelocity().y <= 0.2;
+        boolean isBallOnFloor = golfBall.getPosition().y < 6.33; //fixme: this value is hardcoded for map 1, may not work for others
+        boolean doesBallHaveNoVelocity = golfBall.getLinearVelocity().x <= 0.2 && golfBall.getLinearVelocity().y <= 0.2 &&
+                golfBall.getLinearVelocity().x >= -0.2 && golfBall.getLinearVelocity().y >= -0.2;
         return isBallOnFloor && doesBallHaveNoVelocity;
     }
 
