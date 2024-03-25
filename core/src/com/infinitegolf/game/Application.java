@@ -227,11 +227,16 @@ public class Application extends ApplicationAdapter {
         Vector3 position = camera.position;
         position.x = golfBall.getPosition().x * PPM;
         position.y = (golfBall.getPosition().y + 3.1f) * PPM;
-        float mapWidth = 1000; // Get width in pixels
-        float mapHeight = 667; // Get height in pixels
-        // Clamp camera position within map boundaries
-        camera.position.x = Math.min(Math.max(position.x, camera.viewportWidth / 2f), mapWidth - camera.viewportWidth / 2f);
-        camera.position.y = Math.min(Math.max(position.y, camera.viewportHeight / 2f), mapHeight - camera.viewportHeight / 2f);
+        if (position.x - camera.viewportWidth / 2f < 0) {
+            position.x = camera.viewportWidth / 2f;
+        }
+        if (position.x + camera.viewportWidth / 2f > 480) {
+            position.x = 480 - camera.viewportWidth / 2f;
+        }
+        if (position.y + camera.viewportHeight / 2f > 321) {
+            position.y = 321 - camera.viewportHeight / 2f;
+        }
+        camera.position.set(position);
         camera.update();
     }
 
