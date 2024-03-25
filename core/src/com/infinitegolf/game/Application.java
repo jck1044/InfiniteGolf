@@ -197,14 +197,14 @@ public class Application extends ApplicationAdapter {
                 if (powerBallSize >= (golfBallSize * 8)) {
                     powerUp = false;
                 } else {
-                    powerBallSize *= 1.15f;
+                    powerBallSize *= 1.1f;
                 }
             } else {
                 if (powerBallSize <= (golfBallSize + 1)) {
                     powerBallSize = golfBallSize;
                     powerUp = true;
                 } else {
-                    powerBallSize *= 0.85f;
+                    powerBallSize *= 0.9f;
                 }
             }
         }
