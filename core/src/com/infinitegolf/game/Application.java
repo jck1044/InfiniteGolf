@@ -186,11 +186,11 @@ public class Application extends ApplicationAdapter {
     public void inputUpdate(float delta) {
         if (!isBallInHole) {
             if (Gdx.input.isKeyPressed((Input.Keys.LEFT)) && arrowAngle < 180) {
-                arrowAngle++;
+                arrowAngle += 2;
 //            System.out.println(arrowAngle);
             }
             if (Gdx.input.isKeyPressed((Input.Keys.RIGHT)) && arrowAngle > 0) {
-                arrowAngle--;
+                arrowAngle -= 2;
 //            System.out.println(arrowAngle);
             }
             if (Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
