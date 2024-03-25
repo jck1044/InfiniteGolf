@@ -9,7 +9,7 @@ public class DesktopLauncher {
 	public static void main (String[] arg) {
 		Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
 		config.setForegroundFPS(60);
-		config.setWindowedMode(1024, 683); //2:3 aspect ratio instead of his 3:4
+		config.setWindowedMode(1000, 667); //2:3 aspect ratio instead of his 3:4
 		config.setTitle("InfiniteGolf");
 		new Lwjgl3Application(new InfiniteGolf(), config);
 	}

@@ -15,7 +15,7 @@ public class BackgroundElementView extends GameObjectView {
     public BackgroundElementView(BackgroundElement model, SpriteBatch batch) {
         super(batch);
         this.model = model;
-        this.staticImg = new Sprite(Assets.getTexture("textures/sky.jpg"));
+        this.staticImg = new Sprite(Assets.getTexture("textures/sky.jpeg"));
     }
 
     public void render(float dt) {

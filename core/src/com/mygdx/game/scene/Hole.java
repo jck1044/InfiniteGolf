@@ -38,7 +38,7 @@ public class Hole extends Scene {
         this.loadAssets();
         float w = Gdx.graphics.getWidth();
         float h = Gdx.graphics.getHeight();
-        camera = new OrthographicCamera(30, 30 * (h / w));
+        camera = new OrthographicCamera(1000, 1000 * (h / w));
         camera.position.set(camera.viewportWidth / 2f, camera.viewportHeight / 2f, 0);
         camera.update();
 
@@ -84,7 +84,8 @@ public class Hole extends Scene {
     }
 
     private void loadAssets() {
-        Assets.addTexture("textures/sky.jpg");
+        Assets.addTexture("textures/sky.jpeg");
+        Assets.addTexture("textures/ball.png");
         Assets.addTextureAtlas("textures/ball.txt");
         Assets.loadAll();
     }

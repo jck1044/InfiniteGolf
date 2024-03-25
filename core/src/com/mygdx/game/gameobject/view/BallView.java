@@ -1,5 +1,6 @@
 package com.mygdx.game.gameobject.view;
 
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -8,6 +9,8 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.gameobject.model.BallModel;
 import com.mygdx.game.utils.Assets;
+
+import java.util.Random;
 
 public class BallView extends GameObjectView {
     private final BallModel model;
@@ -21,12 +24,16 @@ public class BallView extends GameObjectView {
     final float animationFrameDuration = 0.5F;
     private int rotationAngle;
     final int rotationDegrees = 50;
+    private final Sprite img;
+
 
     public BallView(BallModel model, SpriteBatch batch) {
         super(batch);
         this.model = model;
         this.batch = batch;
         this.textureAtlas = Assets.getTextureAtlas("textures/ball.txt");
+        this.img = textureAtlas.createSprite("ball");
+        this.img.setOrigin( this.model.getRadius(),this.model.getRadius());
         this.animationFrames = new Array<>();
         animationFrames.add(textureAtlas.createSprites("ball"));
         currentAnimation = new Animation<>(this.animationFrameDuration, animationFrames.get(0));
