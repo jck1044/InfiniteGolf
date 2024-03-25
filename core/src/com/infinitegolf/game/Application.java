@@ -106,15 +106,15 @@ public class Application extends ApplicationAdapter {
             powerSprite.setSize(powerBallSize, powerBallSize);
             powerSprite.draw(batch);
 
-
-            Sprite arrowSprite = new Sprite(arrowTexture);
-            arrowSprite.setX(golfBall.getPosition().x * PPM);
-            arrowSprite.setY(golfBall.getPosition().y * PPM - ((ballTexture.getHeight() * (arrowSize / golfBallSize)) / 2));
-            arrowSprite.setSize(arrowSize, arrowSize);
-            arrowSprite.setOrigin(0, golfBallSize);
-            arrowSprite.setRotation(arrowAngle);
-            arrowSprite.draw(batch);
-
+            if (isBallStopped()) {
+                Sprite arrowSprite = new Sprite(arrowTexture);
+                arrowSprite.setX(golfBall.getPosition().x * PPM);
+                arrowSprite.setY(golfBall.getPosition().y * PPM - ((ballTexture.getHeight() * (arrowSize / golfBallSize)) / 2));
+                arrowSprite.setSize(arrowSize, arrowSize);
+                arrowSprite.setOrigin(0, golfBallSize);
+                arrowSprite.setRotation(arrowAngle);
+                arrowSprite.draw(batch);
+            }
             if (shotCounter < par) {
                 font.setColor(Color.GREEN);
             } else if (shotCounter == par) {
@@ -170,7 +170,7 @@ public class Application extends ApplicationAdapter {
                 golfBall.applyForceToCenter(horizontalForce, verticalForce, false);
                 powerBallSize = golfBallSize;
                 shotCounter++;
-                System.out.println(shotCounter);
+//                System.out.println(shotCounter);
             }
         }
     }
