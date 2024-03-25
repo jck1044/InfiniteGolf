@@ -15,6 +15,7 @@ import com.badlogic.gdx.maps.MapProperties;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Body;
@@ -226,19 +227,13 @@ public class Application extends ApplicationAdapter {
         Vector3 position = camera.position;
         position.x = golfBall.getPosition().x * PPM;
         position.y = (golfBall.getPosition().y + 3.1f) * PPM;
-
-//		Rectangle bounds = tmr.getViewBounds();
-        float mapWidth = tmr.getViewBounds().width;
-        float mapHeight = tmr.getViewBounds().height;
-        if (tmr != null) {
-
-        } else {
-            camera.position.set(position);
-        }
-
+        float mapWidth = 1000; // Get width in pixels
+        float mapHeight = 667; // Get height in pixels
+        // Clamp camera position within map boundaries
+        camera.position.x = Math.min(Math.max(position.x, camera.viewportWidth / 2f), mapWidth - camera.viewportWidth / 2f);
+        camera.position.y = Math.min(Math.max(position.y, camera.viewportHeight / 2f), mapHeight - camera.viewportHeight / 2f);
         camera.update();
     }
-
 
     public Body createBall() {
         MapProperties ballProperties = map.getLayers().get("ball")
