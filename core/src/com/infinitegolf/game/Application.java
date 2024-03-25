@@ -84,7 +84,7 @@ public class Application extends ApplicationAdapter {
     @Override
     public void render() {
         updateGame(Gdx.graphics.getDeltaTime());
-        ScreenUtils.clear(0, 0, 0, 1);
+        ScreenUtils.clear(0.325f, 0.576f, 0.867f, 1); // Set clear color to our sky's blue
 
         tmr.render();
 
@@ -200,15 +200,16 @@ public class Application extends ApplicationAdapter {
     }
 
     private boolean isBallStopped() {
-        boolean isBallOnFloor = golfBall.getPosition().y < 6.32; //fixme: this value is hardcoded for map 1, may not work for others
-        boolean doesBallHaveNoVelocity = golfBall.getLinearVelocity().x <= 0.2 && golfBall.getLinearVelocity().y <= 0.2;
+        boolean isBallOnFloor = golfBall.getPosition().y < 6.33; //fixme: this value is hardcoded for map 1, may not work for others
+        boolean doesBallHaveNoVelocity = golfBall.getLinearVelocity().x <= 0.2 && golfBall.getLinearVelocity().y <= 0.2 &&
+                golfBall.getLinearVelocity().x >= -0.2 && golfBall.getLinearVelocity().y >= -0.2;
         return isBallOnFloor && doesBallHaveNoVelocity;
     }
 
     public void updateCamera(float delta) {
         Vector3 position = camera.position;
         position.x = golfBall.getPosition().x * PPM;
-        position.y = (golfBall.getPosition().y + 2) * PPM;
+        position.y = (golfBall.getPosition().y + 3.1f) * PPM;
 
 //		Rectangle bounds = tmr.getViewBounds();
         float mapWidth = tmr.getViewBounds().width;
