@@ -19,9 +19,12 @@ import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.CircleShape;
+import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.ScreenUtils;
+
+import java.util.ArrayList;
 
 import Utils.TileObjectUtil;
 
@@ -38,9 +41,6 @@ public class Application extends ApplicationAdapter {
     private Box2DDebugRenderer b2dr;
     private World world;
     private Body golfBall, platform;
-//    private float horizontalForce = 0;
-//    private float verticalForce = 0;
-    //    private float power = 0;
     private Boolean powerUp = true;
     private float powerBallSize = golfBallSize;
     private final float arrowSize = 32;
@@ -106,7 +106,6 @@ public class Application extends ApplicationAdapter {
 
 
         ballSprite.draw(batch);
-        //		batch.draw(ballTexture,golfBall.getPosition().x * PPM - (ballTexture.getWidth()/2),golfBall.getPosition().y * PPM - (ballTexture.getHeight()/2));
         batch.end();
 
         b2dr.render(world, camera.combined.scl(PPM));
@@ -155,44 +154,13 @@ public class Application extends ApplicationAdapter {
     public void inputUpdate(float delta) {
         if (Gdx.input.isKeyPressed((Input.Keys.LEFT)) && arrowAngle < 180) {
             arrowAngle++;
-            System.out.println(arrowAngle);
-//            horizontalForce -= 1;
+//            System.out.println(arrowAngle);
         }
         if (Gdx.input.isKeyPressed((Input.Keys.RIGHT)) && arrowAngle > 0) {
             arrowAngle--;
-            System.out.println(arrowAngle);
-//            horizontalForce += 1;
+//            System.out.println(arrowAngle);
         }
-//        if (Gdx.input.isKeyJustPressed((Input.Keys.SPACE))) {
-//            golfBall.applyForceToCenter(0, 500, false);
-//        }
-
-
-//        if (Gdx.input.isKeyPressed(Input.Keys.LEFT) && horizontalForce == 0) {
-//            if (redBallX - ballX > -25) {
-//                redBallX -= 2;
-//                if (redBallX - ballX - 5 > 0) {
-//                    redBallY += 2;
-//                } else if (redBallX - ballX < 0) {
-//                    redBallY -= 2;
-//                }
-//                up = (redBallY - ballY - 5) / 25;
-//                right = (redBallX - ballX - 5) / 30;
-//            }
-//        } else if (Gdx.input.isKeyPressed(Input.Keys.RIGHT) && horizontalForce == 0) {
-//            if (redBallX - ballX < 35) {
-//                redBallX += 2;
-//                if (redBallX - ballX - 10 > 0) {
-//                    redBallY -= 2;
-//                } else if (redBallX - ballX - 5 < 0) {
-//                    redBallY += 2;
-//                }
-//                up = (redBallY - ballY - 5) / 25;
-//                right = (redBallX - ballX - 5) / 30;
-//            }
-//        } else
         if (Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
-//            ballAngle = 0;
             if (powerUp) {
                 if (powerBallSize >= (golfBallSize * 8)) {
                     powerUp = false;
@@ -208,30 +176,6 @@ public class Application extends ApplicationAdapter {
                 }
             }
         }
-
-//        if (horizontalForce > 0) {
-//            ballX += (movingPower * right);
-//            ballY += (movingPower * up);
-//            redBallX = -10;
-//            redBallY = -10;
-//            movingPower = (float) (movingPower * 0.96);
-//            if (movingPower <= .5 && ballY <= 250.01) {
-//                movingPower = 0;
-//                velocityY = 0;
-//                ballY = 250;
-//                redBallX = ballX + 35;
-//                redBallY = ballY + 5;
-//                up = 0;
-//                right = 1;
-//            }
-//        }
-//        if (power > 0) {
-//            movingPower = (float) (power * 1.6);
-//            power = 0;
-//        }
-
-
-//        golfBall.setLinearVelocity(horizontalForce * 5, golfBall.getLinearVelocity().y);
     }
 
     public void updateCamera(float delta) {
@@ -267,9 +211,10 @@ public class Application extends ApplicationAdapter {
 
         CircleShape shape = new CircleShape();
         shape.setRadius(((float) ballProperties.get("height") / 2) / PPM);
-
         golfBallBody.createFixture(shape, 5.0f);
         shape.dispose();
+        float angularDamping = 10f;
+        golfBallBody.setAngularDamping(angularDamping);
         return golfBallBody;
     }
 
