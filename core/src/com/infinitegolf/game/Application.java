@@ -52,7 +52,8 @@ public class Application extends ApplicationAdapter {
     private int shotCounter = 0;
     private BitmapFont font;
     private int par = 3;
-
+    private boolean isBallInHole = false;
+    private int holeNumber = 1;
 
     @Override
     public void create() {
@@ -95,31 +96,36 @@ public class Application extends ApplicationAdapter {
         ballSprite.setX(golfBall.getPosition().x * PPM - ((float) ballTexture.getWidth() / 2));
         ballSprite.setY(golfBall.getPosition().y * PPM - ((float) ballTexture.getHeight() / 2));
 
-        Sprite powerSprite = new Sprite(ballTexture);
+        if (!isBallInHole) {
+            Sprite powerSprite = new Sprite(ballTexture);
 //        powerSprite.setOrigin(ballSprite.getOriginX(), ballSprite.getOriginY());
-        powerSprite.setX(golfBall.getPosition().x * PPM - ((ballTexture.getWidth() * (powerBallSize / golfBallSize)) / 2));
-        powerSprite.setY(golfBall.getPosition().y * PPM - ((ballTexture.getHeight() * (powerBallSize / golfBallSize)) / 2));
-        powerSprite.setSize(powerBallSize, powerBallSize);
-        powerSprite.draw(batch);
+            powerSprite.setX(golfBall.getPosition().x * PPM - ((ballTexture.getWidth() * (powerBallSize / golfBallSize)) / 2));
+            powerSprite.setY(golfBall.getPosition().y * PPM - ((ballTexture.getHeight() * (powerBallSize / golfBallSize)) / 2));
+            powerSprite.setSize(powerBallSize, powerBallSize);
+            powerSprite.draw(batch);
 
 
-        Sprite arrowSprite = new Sprite(arrowTexture);
-        arrowSprite.setX(golfBall.getPosition().x * PPM);
-        arrowSprite.setY(golfBall.getPosition().y * PPM - ((ballTexture.getHeight() * (arrowSize / golfBallSize)) / 2));
-        arrowSprite.setSize(arrowSize, arrowSize);
-        arrowSprite.setOrigin(0, golfBallSize);
-        arrowSprite.setRotation(arrowAngle);
-        arrowSprite.draw(batch);
+            Sprite arrowSprite = new Sprite(arrowTexture);
+            arrowSprite.setX(golfBall.getPosition().x * PPM);
+            arrowSprite.setY(golfBall.getPosition().y * PPM - ((ballTexture.getHeight() * (arrowSize / golfBallSize)) / 2));
+            arrowSprite.setSize(arrowSize, arrowSize);
+            arrowSprite.setOrigin(0, golfBallSize);
+            arrowSprite.setRotation(arrowAngle);
+            arrowSprite.draw(batch);
 
-        if (shotCounter < par) {
-            font.setColor(Color.GREEN);
-        } else if (shotCounter == par) {
-            font.setColor(Color.YELLOW);
+            if (shotCounter < par) {
+                font.setColor(Color.GREEN);
+            } else if (shotCounter == par) {
+                font.setColor(Color.YELLOW);
+            } else {
+                font.setColor(Color.RED);
+            }
+            font.draw(batch, String.valueOf(shotCounter), camera.viewportWidth / 2f + (camera.position.x - camera.viewportWidth / 2f), camera.viewportHeight / 2f + camera.position.y);
         } else {
-            font.setColor(Color.RED);
+            font.getData().setScale(2);
+            font.draw(batch, "Hole #" + holeNumber + " finished in " + shotCounter + " shots",
+                    camera.position.x - camera.viewportWidth / 2.5f, camera.viewportHeight / 1.5f);
         }
-        font.draw(batch, String.valueOf(shotCounter), camera.viewportWidth / 2f + (camera.position.x - camera.viewportWidth / 2f), camera.viewportHeight / 2f + camera.position.y);
-
 
         ballSprite.draw(batch);
         batch.end();
@@ -143,8 +149,15 @@ public class Application extends ApplicationAdapter {
         inputUpdate(delta);
         updateGolfBallPosition(delta);
         updateCamera(delta);
+        checkIfBallInHole(delta);
         tmr.setView(camera);
         batch.setProjectionMatrix(camera.combined);
+    }
+
+    private void checkIfBallInHole(float delta) {
+        if (golfBall.getPosition().y < 5.4) {
+            isBallInHole = true;
+        }
     }
 
     public void updateGolfBallPosition(float delta) {
@@ -171,28 +184,30 @@ public class Application extends ApplicationAdapter {
     }
 
     public void inputUpdate(float delta) {
-        if (Gdx.input.isKeyPressed((Input.Keys.LEFT)) && arrowAngle < 180) {
-            arrowAngle++;
+        if (!isBallInHole) {
+            if (Gdx.input.isKeyPressed((Input.Keys.LEFT)) && arrowAngle < 180) {
+                arrowAngle++;
 //            System.out.println(arrowAngle);
-        }
-        if (Gdx.input.isKeyPressed((Input.Keys.RIGHT)) && arrowAngle > 0) {
-            arrowAngle--;
+            }
+            if (Gdx.input.isKeyPressed((Input.Keys.RIGHT)) && arrowAngle > 0) {
+                arrowAngle--;
 //            System.out.println(arrowAngle);
-        }
-        if (Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
-            if (isBallStopped()) {
-                if (powerUp) {
-                    if (powerBallSize >= (golfBallSize * 8)) {
-                        powerUp = false;
+            }
+            if (Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
+                if (isBallStopped()) {
+                    if (powerUp) {
+                        if (powerBallSize >= (golfBallSize * 8)) {
+                            powerUp = false;
+                        } else {
+                            powerBallSize *= 1.1f;
+                        }
                     } else {
-                        powerBallSize *= 1.1f;
-                    }
-                } else {
-                    if (powerBallSize <= (golfBallSize + 1)) {
-                        powerBallSize = golfBallSize;
-                        powerUp = true;
-                    } else {
-                        powerBallSize *= 0.9f;
+                        if (powerBallSize <= (golfBallSize + 1)) {
+                            powerBallSize = golfBallSize;
+                            powerUp = true;
+                        } else {
+                            powerBallSize *= 0.9f;
+                        }
                     }
                 }
             }
