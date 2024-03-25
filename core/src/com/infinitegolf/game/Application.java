@@ -27,6 +27,7 @@ import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.ScreenUtils;
 
 import java.util.ArrayList;
+import java.util.Vector;
 
 import Utils.TileObjectUtil;
 
@@ -256,8 +257,8 @@ public class Application extends ApplicationAdapter {
         shape.setRadius(((float) ballProperties.get("height") / 2) / PPM);
         golfBallBody.createFixture(shape, 5.0f);
         shape.dispose();
-        float angularDamping = 10f;
-        golfBallBody.setAngularDamping(angularDamping);
+        float linearDamping = 1f;
+        golfBallBody.setLinearDamping(linearDamping);
         return golfBallBody;
     }
 
