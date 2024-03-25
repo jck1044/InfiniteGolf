@@ -5,8 +5,10 @@ import static Utils.Constants.PPM;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.maps.MapProperties;
@@ -47,6 +49,10 @@ public class Application extends ApplicationAdapter {
     private float ballAngle = 0;
     private float arrowAngle = 0;
     private float ballPower = 0;
+    private int shotCounter = 0;
+    private BitmapFont font;
+    private int par = 3;
+
 
     @Override
     public void create() {
@@ -62,6 +68,7 @@ public class Application extends ApplicationAdapter {
         b2dr = new Box2DDebugRenderer();
 
         batch = new SpriteBatch();
+        font = new BitmapFont();
         ballTexture = new Texture("Images/GolfBall.png");
         arrowTexture = new Texture("Images/Arrow.png");
 
@@ -104,6 +111,15 @@ public class Application extends ApplicationAdapter {
         arrowSprite.setRotation(arrowAngle);
         arrowSprite.draw(batch);
 
+        if (shotCounter < par) {
+            font.setColor(Color.GREEN);
+        } else if (shotCounter == par) {
+            font.setColor(Color.YELLOW);
+        } else {
+            font.setColor(Color.RED);
+        }
+        font.draw(batch, String.valueOf(shotCounter), camera.viewportWidth / 2f + (camera.position.x - camera.viewportWidth / 2f), camera.viewportHeight / 2f + camera.position.y);
+
 
         ballSprite.draw(batch);
         batch.end();
@@ -119,6 +135,7 @@ public class Application extends ApplicationAdapter {
         b2dr.dispose();
         tmr.dispose();
         map.dispose();
+        font.dispose();
     }
 
     public void updateGame(float delta) {
@@ -137,6 +154,8 @@ public class Application extends ApplicationAdapter {
                 float verticalForce = getVerticalForce(arrowAngle) * powerBallSize / 5;
                 golfBall.applyForceToCenter(horizontalForce, verticalForce, false);
                 powerBallSize = golfBallSize;
+                shotCounter++;
+                System.out.println(shotCounter);
             }
         }
     }
