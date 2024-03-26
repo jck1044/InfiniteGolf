@@ -69,7 +69,8 @@ public class Hole extends Scene {
 
     private final float golfBallSize = 16;
     private Body golfBallBody;
-
+    private Boolean isBallInHole = false;
+    private int holeNumber = 1;
 
     public Hole(Game game, String mapFile) { // Need to add a parameter for the map file
         this.game = game;
@@ -161,22 +162,25 @@ public class Hole extends Scene {
         tmr.render();
         batch.begin();
 
-//        if (!isBallStopped()) {
-        golfBallController.updatePosition(golfBallBody);
-        powerBallController.updatePosition(golfBallBody);
-        arrowController.updatePosition(golfBallBody);
-//        }
+        if (!isBallInHole) {
+            golfBallController.updatePosition(golfBallBody);
+            powerBallController.updatePosition(golfBallBody);
+            arrowController.updatePosition(golfBallBody);
 
 
-        if (shotCounter < par) {
-            font.setColor(Color.GREEN);
-        } else if (shotCounter == par) {
-            font.setColor(Color.YELLOW);
+            if (shotCounter < par) {
+                font.setColor(Color.GREEN);
+            } else if (shotCounter == par) {
+                font.setColor(Color.YELLOW);
+            } else {
+                font.setColor(Color.RED);
+            }
+            font.draw(batch, String.valueOf(shotCounter), camera.viewportWidth / 2f + (camera.position.x - camera.viewportWidth / 2f), camera.viewportHeight / 2f + camera.position.y);
         } else {
-            font.setColor(Color.RED);
+            font.getData().setScale(2);
+            font.draw(batch, "Hole # " + holeNumber + " finished in " + shotCounter + " shots",
+                    camera.position.x - camera.viewportWidth / 2.5f, camera.viewportHeight / 1.5f);
         }
-        font.draw(batch, String.valueOf(shotCounter), camera.viewportWidth / 2f + (camera.position.x - camera.viewportWidth / 2f), camera.viewportHeight / 2f + camera.position.y);
-
         golfBallController.getBallSprite().draw(batch);
 
         batch.end();
@@ -189,8 +193,15 @@ public class Hole extends Scene {
         inputUpdate(dt);
         updateGolfBallPosition(dt);
         updateCamera(dt);
+        checkIfBallInHole(dt);
         tmr.setView(camera);
         batch.setProjectionMatrix(camera.combined);
+    }
+
+    private void checkIfBallInHole(float dt) {
+        if (golfBallBody.getPosition().y < 5.4) {
+            isBallInHole = true;
+        }
     }
 
     public void inputUpdate(float delta) {
