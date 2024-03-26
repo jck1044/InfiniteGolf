@@ -30,7 +30,7 @@ public abstract class Scene implements Screen {
         camera.update();
 
         batch.setProjectionMatrix(camera.combined);
-        ScreenUtils.clear(0, 0, 0, 1);
+        ScreenUtils.clear(0.325f, 0.576f, 0.867f, 1); // Set clear color to our sky's blue
         batch.begin();
 
         for (
