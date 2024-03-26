@@ -26,7 +26,7 @@ public abstract class Scene implements Screen {
 
 
     public void render(float dt) {
-        this.updateScene(dt);
+//        this.updateScene(dt);
         camera.update();
 
         batch.setProjectionMatrix(camera.combined);

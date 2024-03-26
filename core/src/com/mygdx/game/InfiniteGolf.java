@@ -23,7 +23,7 @@ public class InfiniteGolf extends Game {
     @Override
     public void render() {
         float dt = Gdx.graphics.getDeltaTime();
-        ScreenUtils.clear(0.325f, 0.576f, 0.867f, 1); // Set clear color to our sky's blue
+//        ScreenUtils.clear(0.325f, 0.576f, 0.867f, 1); // Set clear color to our sky's blue
         this.getScreen().render(dt);
         hole.updateScene(dt);
     }
