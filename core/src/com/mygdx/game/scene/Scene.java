@@ -25,7 +25,7 @@ public abstract class Scene implements Screen {
     Array<DynamicGameObjectModel> dynamicGameObjects;
 
 
-    public void render (float dt) {
+    public void render(float dt) {
         this.updateScene(dt);
         camera.update();
 
@@ -45,6 +45,7 @@ public abstract class Scene implements Screen {
     }
 
     public abstract void initScene();
+
     public abstract void updateScene(float dt);
 
     @Override
@@ -53,7 +54,7 @@ public abstract class Scene implements Screen {
     }
 
     @Override
-    public void dispose () {
+    public void dispose() {
         batch.dispose();
     }
 

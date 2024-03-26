@@ -33,6 +33,7 @@ public class GolfBallModel extends DynamicGameObjectModel {
     public short getLayer() {
         return layer;
     }
+
     public Vector2 getMovementVector() {
         return movementVector;
     }

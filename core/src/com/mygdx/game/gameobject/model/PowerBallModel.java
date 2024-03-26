@@ -23,6 +23,7 @@ public class PowerBallModel extends DynamicGameObjectModel {
     public short getLayer() {
         return layer;
     }
+
     public Vector2 getMovementVector() {
         return movementVector;
     }

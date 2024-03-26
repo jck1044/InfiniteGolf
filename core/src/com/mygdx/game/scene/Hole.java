@@ -162,11 +162,10 @@ public class Hole extends Scene {
         batch.begin();
 
 //        if (!isBallStopped()) {
-            golfBallController.updatePosition(golfBallBody);
-            powerBallController.updatePosition(golfBallBody);
-            arrowController.updatePosition(golfBallBody);
+        golfBallController.updatePosition(golfBallBody);
+        powerBallController.updatePosition(golfBallBody);
+        arrowController.updatePosition(golfBallBody);
 //        }
-
 
 
         if (shotCounter < par) {
@@ -252,6 +251,7 @@ public class Hole extends Scene {
             return 90 - (arrowAngle - 90);
         }
     }
+
     private void addToGameObjectViews(GameObjectView view) {
         short layer = view.getLayer();
         if (!this.gameObjectViews.containsKey(layer)) {

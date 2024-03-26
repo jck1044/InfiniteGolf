@@ -30,7 +30,7 @@ public class GolfBallView extends GameObjectView {
         this.model = model;
         this.batch = batch;
         this.texture = Assets.getTexture("Images/GolfBall.png");
-        this.ballSprite =  new Sprite(this.texture);
+        this.ballSprite = new Sprite(this.texture);
     }
 
     public void updatePosition(Body golfBallBody) {

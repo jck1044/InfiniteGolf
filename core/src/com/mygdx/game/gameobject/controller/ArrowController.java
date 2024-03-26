@@ -8,6 +8,7 @@ import com.mygdx.game.gameobject.view.ArrowView;
 public class ArrowController {
     private ArrowModel model;
     private ArrowView view;
+
     public ArrowController(ArrowModel model, ArrowView view) {
         this.model = model;
         this.view = view;

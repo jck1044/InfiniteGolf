@@ -24,7 +24,7 @@ public class ArrowView extends GameObjectView {
         this.model = model;
         this.batch = batch;
         this.texture = Assets.getTexture("Images/Arrow.png");
-        this.arrowSprite =  new Sprite(this.texture);
+        this.arrowSprite = new Sprite(this.texture);
     }
 
     public void updatePosition(Body golfBallBody) {
@@ -37,11 +37,11 @@ public class ArrowView extends GameObjectView {
     }
 
     public void increaseAngle() {
-        arrowAngle+=2;
+        arrowAngle += 2;
     }
 
     public void decreaseAngle() {
-        arrowAngle-=2;
+        arrowAngle -= 2;
     }
 
     public float getAngle() {

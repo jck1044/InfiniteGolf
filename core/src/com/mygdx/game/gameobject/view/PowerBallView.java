@@ -23,7 +23,7 @@ public class PowerBallView extends GameObjectView {
         this.model = model;
         this.batch = batch;
         this.ballTexture = Assets.getTexture("Images/GolfBall.png");
-        this.powerSprite =  new Sprite(this.ballTexture);
+        this.powerSprite = new Sprite(this.ballTexture);
     }
 
     public void updatePosition(Body golfBallBody) {

@@ -22,6 +22,7 @@ public class Menu extends Scene {
     GolfBallController playerController;
     Array<BackgroundElementModel> backgroundObjects;
     SortedMap<Short, Array<GameObjectView>> gameObjectViews;
+
     public Menu(Game game) {
         this.game = game;
     }
