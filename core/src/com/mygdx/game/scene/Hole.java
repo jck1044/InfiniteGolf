@@ -161,11 +161,11 @@ public class Hole extends Scene {
         tmr.render();
         batch.begin();
 
-        if (!isBallStopped()) {
+//        if (!isBallStopped()) {
             golfBallController.updatePosition(golfBallBody);
             powerBallController.updatePosition(golfBallBody);
             arrowController.updatePosition(golfBallBody);
-        }
+//        }
 
 
 

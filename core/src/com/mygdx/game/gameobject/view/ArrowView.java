@@ -29,7 +29,7 @@ public class ArrowView extends GameObjectView {
 
     public void updatePosition(Body golfBallBody) {
         arrowSprite.setX(golfBallBody.getPosition().x * PPM);
-        arrowSprite.setY(golfBallBody.getPosition().y * PPM - ((texture.getHeight() * (arrowSize / golfBallSize)) / 2));
+        arrowSprite.setY(golfBallBody.getPosition().y * PPM - ((16 * (arrowSize / golfBallSize)) / 2)); //16 hardcoded as height of normal golf ball
         arrowSprite.setSize(arrowSize, arrowSize);
         arrowSprite.setOrigin(0, golfBallSize);
         arrowSprite.setRotation(arrowAngle);
