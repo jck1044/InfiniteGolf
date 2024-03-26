@@ -32,7 +32,6 @@ public class InfiniteGolf extends Game {
     public void dispose() {
         this.getScreen().dispose();
         Assets.dispose();
-        batch.dispose();
 //        ballTexture.dispose();
 //        world.dispose();
 //        b2dr.dispose();

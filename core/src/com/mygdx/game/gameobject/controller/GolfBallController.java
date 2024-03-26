@@ -1,33 +1,26 @@
 package com.mygdx.game.gameobject.controller;
 
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.Body;
 import com.mygdx.game.gameobject.model.GolfBallModel;
+import com.mygdx.game.gameobject.view.GolfBallView;
 
 public class GolfBallController {
     private final GolfBallModel model;
+    private final GolfBallView view;
 
-    public GolfBallController(GolfBallModel model) {
+    public GolfBallController(GolfBallModel model, GolfBallView view) {
         this.model = model;
+        this.view = view;
     }
 
-    public void moveLeft() {
-        this.model.setMovementVector(new Vector2(-1, 0));
+    public void updatePosition(Body golfBallBody) {
+        this.view.updatePosition(golfBallBody);
     }
 
-    public void moveRight() {
-        this.model.setMovementVector(new Vector2(1, 0));
-    }
-
-    public void moveUp() {
-        this.model.setMovementVector(new Vector2(0, 1));
-    }
-
-    public void moveDown() {
-        this.model.setMovementVector(new Vector2(0, -1));
-    }
-
-    public void stop() {
-        this.model.setMovementVector(new Vector2(0, 0));
+    public Sprite getBallSprite() {
+        return this.view.getBallSprite();
     }
 
 }

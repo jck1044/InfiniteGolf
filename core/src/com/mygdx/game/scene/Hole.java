@@ -11,22 +11,29 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.maps.MapProperties;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Body;
+import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
+import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.InputHandler;
+import com.mygdx.game.gameobject.controller.ArrowController;
 import com.mygdx.game.gameobject.controller.GolfBallController;
-import com.mygdx.game.gameobject.model.BackgroundElementModel;
+import com.mygdx.game.gameobject.controller.PowerBallController;
+import com.mygdx.game.gameobject.model.ArrowModel;
 import com.mygdx.game.gameobject.model.GolfBallModel;
-import com.mygdx.game.gameobject.view.BackgroundElementView;
+import com.mygdx.game.gameobject.model.PowerBallModel;
+import com.mygdx.game.gameobject.view.ArrowView;
 import com.mygdx.game.gameobject.view.GolfBallView;
 import com.mygdx.game.gameobject.view.GameObjectView;
+import com.mygdx.game.gameobject.view.PowerBallView;
 import com.mygdx.game.utils.Assets;
 
 import java.util.TreeMap;
@@ -40,34 +47,34 @@ public class Hole extends Scene {
 
     private Game game;
     private final float SCALE = 2.5f;
-    GolfBallView golfBallView;
-    GolfBallController golfBallController;
-    private GolfBallModel golfBall;
+    private GolfBallView golfBallView;
+    private GolfBallController golfBallController;
+    private GolfBallModel golfBallModel;
+    private PowerBallView powerBallView;
+    private PowerBallController powerBallController;
+    private PowerBallModel powerBallModel;
+    private ArrowView arrowView;
+    private ArrowController arrowController;
+    private ArrowModel arrowModel;
     private World world;
     private TiledMap map;
     private OrthogonalTiledMapRenderer tmr;
     private String mapFile;
-    private final float arrowSize = 32;
-    private float arrowAngle = 0;
-    private float ballPower = 0;
     private int shotCounter = 0;
     private int par = 3;
-    Texture ballTexture;
-    Texture arrowTexture;
     private Box2DDebugRenderer b2dr;
     private BitmapFont font;
-    private float ballAngle = 0;
 
     private Boolean powerUp = true;
 
     private final float golfBallSize = 16;
-    private float powerBallSize = golfBallSize;
+    private Body golfBallBody;
 
 
     public Hole(Game game, String mapFile) { // Need to add a parameter for the map file
         this.game = game;
         this.mapFile = mapFile;
-
+        this.createHole();
     }
 
     @Override
@@ -83,19 +90,22 @@ public class Hole extends Scene {
         camera.position.set(camera.viewportWidth / 2f, camera.viewportHeight / 2f, 0);
         camera.update();
 
-        this.createHole();
+        batch = new SpriteBatch();
 
+        golfBallModel = new GolfBallModel(new Vector2(5, 2));
+        golfBallView = new GolfBallView(golfBallModel, batch);
+        golfBallController = new GolfBallController(golfBallModel, golfBallView);
+
+        powerBallModel = new PowerBallModel(new Vector2(5, 2));
+        powerBallView = new PowerBallView(powerBallModel, batch);
+        powerBallController = new PowerBallController(powerBallModel, powerBallView);
+
+        arrowModel = new ArrowModel(new Vector2(5, 2));
+        arrowView = new ArrowView(arrowModel, batch);
+        arrowController = new ArrowController(arrowModel, arrowView);
 
         b2dr = new Box2DDebugRenderer();
         font = new BitmapFont();
-        ballTexture = Assets.getTexture("Images/GolfBall.png");
-        arrowTexture = Assets.getTexture("Images/Arrow.png");
-
-        batch = new SpriteBatch();
-
-        golfBall = new GolfBallModel(new Vector2(5, 2), map, world);
-        golfBallView = new GolfBallView(golfBall, batch);
-        golfBallController = new GolfBallController(golfBall);
 
         backgroundObjects = new Array<>();
         gameObjectViews = new TreeMap<>();
@@ -115,9 +125,28 @@ public class Hole extends Scene {
     private void createHole() {
         world = new World(new Vector2(0, -10), false);
         map = new TmxMapLoader().load(mapFile);
-        tmr = new OrthogonalTiledMapRenderer(map); // Can pass in batch??? for shaders???
+        tmr = new OrthogonalTiledMapRenderer(map);
 
         TileObjectUtil.parseTileObjectLayer(world, map.getLayers().get("collision-layer").getObjects());
+
+        MapProperties ballProperties = map.getLayers().get("ball")
+                .getObjects().get(0).getProperties();
+        float x = (float) ballProperties.get("x");
+        float y = (float) ballProperties.get("y");
+
+        BodyDef def = new BodyDef();
+        def.type = BodyDef.BodyType.DynamicBody;
+        def.position.set(x / PPM, y / PPM);
+        def.fixedRotation = false;
+        golfBallBody = world.createBody(def);
+
+        CircleShape shape = new CircleShape();
+        shape.setRadius(((float) ballProperties.get("height") / 2) / PPM);
+        golfBallBody.createFixture(shape, 5.0f);
+        shape.dispose();
+        float angularDamping = 10f;
+        golfBallBody.setAngularDamping(angularDamping);
+
 
 //        BackgroundElement backdrop = new BackgroundElement(new Vector2(), new Vector2(60F, 65F), BackgroundElementType.BACKDROP, (short)(2000));
 //        BackgroundElementView backdropView = new BackgroundElementView(backdrop, batch);
@@ -128,29 +157,17 @@ public class Hole extends Scene {
 
     @Override
     public void updateScene(float dt) {
-        batch.begin();
+        updateGame(dt);
         tmr.render();
-        Sprite ballSprite = new Sprite(ballTexture);
-        Body golfBallBody = golfBall.getBody();
-        ballAngle = golfBallBody.getAngle() * (180 / (float) Math.PI);
-        ballSprite.rotate(ballAngle);
-        ballSprite.setX(golfBallBody.getPosition().x * PPM - ((float) ballTexture.getWidth() / 2));
-        ballSprite.setY(golfBallBody.getPosition().y * PPM - ((float) ballTexture.getHeight() / 2));
+        batch.begin();
 
-        Sprite powerSprite = new Sprite(ballTexture);
-        powerSprite.setX(golfBallBody.getPosition().x * PPM - ((ballTexture.getWidth() * (powerBallSize / golfBallSize)) / 2));
-        powerSprite.setY(golfBallBody.getPosition().y * PPM - ((ballTexture.getHeight() * (powerBallSize / golfBallSize)) / 2));
-        powerSprite.setSize(powerBallSize, powerBallSize);
-        powerSprite.draw(batch);
+        if (!isBallStopped()) {
+            golfBallController.updatePosition(golfBallBody);
+            powerBallController.updatePosition(golfBallBody);
+            arrowController.updatePosition(golfBallBody);
+        }
 
 
-        Sprite arrowSprite = new Sprite(arrowTexture);
-        arrowSprite.setX(golfBallBody.getPosition().x * PPM);
-        arrowSprite.setY(golfBallBody.getPosition().y * PPM - ((ballTexture.getHeight() * (arrowSize / golfBallSize)) / 2));
-        arrowSprite.setSize(arrowSize, arrowSize);
-        arrowSprite.setOrigin(0, golfBallSize);
-        arrowSprite.setRotation(arrowAngle);
-        arrowSprite.draw(batch);
 
         if (shotCounter < par) {
             font.setColor(Color.GREEN);
@@ -161,11 +178,13 @@ public class Hole extends Scene {
         }
         font.draw(batch, String.valueOf(shotCounter), camera.viewportWidth / 2f + (camera.position.x - camera.viewportWidth / 2f), camera.viewportHeight / 2f + camera.position.y);
 
+        golfBallController.getBallSprite().draw(batch);
 
-        ballSprite.draw(batch);
         batch.end();
 
-        // updateGame code
+    }
+
+    public void updateGame(float dt) {
         b2dr.render(world, camera.combined.scl(PPM));
         world.step(1 / 60f, 6, 2);
         inputUpdate(dt);
@@ -176,36 +195,22 @@ public class Hole extends Scene {
     }
 
     public void inputUpdate(float delta) {
-        if (Gdx.input.isKeyPressed((Input.Keys.LEFT)) && arrowAngle < 180) {
-            arrowAngle++;
+        if (Gdx.input.isKeyPressed((Input.Keys.LEFT)) && arrowController.getAngle() < 180) {
+            arrowController.increaseAngle();
 //            System.out.println(arrowAngle);
         }
-        if (Gdx.input.isKeyPressed((Input.Keys.RIGHT)) && arrowAngle > 0) {
-            arrowAngle--;
+        if (Gdx.input.isKeyPressed((Input.Keys.RIGHT)) && arrowController.getAngle() > 0) {
+            arrowController.decreaseAngle();
 //            System.out.println(arrowAngle);
         }
         if (Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
             if (isBallStopped()) {
-                if (powerUp) {
-                    if (powerBallSize >= (golfBallSize * 8)) {
-                        powerUp = false;
-                    } else {
-                        powerBallSize *= 1.1f;
-                    }
-                } else {
-                    if (powerBallSize <= (golfBallSize + 1)) {
-                        powerBallSize = golfBallSize;
-                        powerUp = true;
-                    } else {
-                        powerBallSize *= 0.9f;
-                    }
-                }
+                powerUp = powerBallController.powerUp(powerUp);
             }
         }
     }
 
     private boolean isBallStopped() {
-        Body golfBallBody = golfBall.getBody();
         boolean isBallOnFloor = golfBallBody.getPosition().y < 6.33; //fixme: this value is hardcoded for map 1, may not work for others
         boolean doesBallHaveNoVelocity = golfBallBody.getLinearVelocity().x <= 0.2 && golfBallBody.getLinearVelocity().y <= 0.2 &&
                 golfBallBody.getLinearVelocity().x >= -0.2 && golfBallBody.getLinearVelocity().y >= -0.2;
@@ -213,14 +218,9 @@ public class Hole extends Scene {
     }
 
     public void updateCamera(float delta) {
-        Body golfBallBody = golfBall.getBody();
         Vector3 position = camera.position;
         position.x = golfBallBody.getPosition().x * PPM;
         position.y = (golfBallBody.getPosition().y + 3.1f) * PPM;
-
-//		Rectangle bounds = tmr.getViewBounds();
-        float mapWidth = tmr.getViewBounds().width;
-        float mapHeight = tmr.getViewBounds().height;
         if (tmr != null) {
 
         } else {
@@ -231,13 +231,12 @@ public class Hole extends Scene {
     }
 
     public void updateGolfBallPosition(float delta) {
-        Body golfBallBody = golfBall.getBody();
         if (!Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
-            if (powerBallSize > golfBallSize) {
-                float horizontalForce = (90 - arrowAngle) * powerBallSize / 3;
-                float verticalForce = getVerticalForce(arrowAngle) * powerBallSize / 5;
+            if (powerBallController.getSize() > golfBallSize) {
+                float horizontalForce = (90 - arrowController.getAngle()) * powerBallController.getSize() / 3;
+                float verticalForce = getVerticalForce(arrowController.getAngle()) * powerBallController.getSize() / 5;
                 golfBallBody.applyForceToCenter(horizontalForce, verticalForce, false);
-                powerBallSize = golfBallSize;
+                powerBallController.setSize(golfBallSize);
                 shotCounter++;
                 System.out.println(shotCounter);
             }
