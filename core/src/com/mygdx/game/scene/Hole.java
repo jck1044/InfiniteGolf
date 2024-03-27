@@ -158,14 +158,19 @@ public class Hole extends Scene {
 
     @Override
     public void updateScene(float dt) {
-        updateGame(dt);
+        updatePhysics(dt);
+
         tmr.render();
         batch.begin();
 
+
         if (!isBallInHole) {
-            golfBallController.updatePosition(golfBallBody);
+            if (!isBallStopped()) {
+                golfBallController.updatePosition(golfBallBody);
+            }
             powerBallController.updatePosition(golfBallBody);
             arrowController.updatePosition(golfBallBody);
+
 
 
             if (shotCounter < par) {
@@ -187,7 +192,7 @@ public class Hole extends Scene {
 
     }
 
-    public void updateGame(float dt) {
+    public void updatePhysics(float dt) {
         b2dr.render(world, camera.combined.scl(PPM));
         world.step(1 / 60f, 6, 2);
         inputUpdate(dt);
@@ -207,11 +212,9 @@ public class Hole extends Scene {
     public void inputUpdate(float delta) {
         if (Gdx.input.isKeyPressed((Input.Keys.LEFT)) && arrowController.getAngle() < 180) {
             arrowController.increaseAngle();
-//            System.out.println(arrowAngle);
         }
         if (Gdx.input.isKeyPressed((Input.Keys.RIGHT)) && arrowController.getAngle() > 0) {
             arrowController.decreaseAngle();
-//            System.out.println(arrowAngle);
         }
         if (Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
             if (isBallStopped()) {
