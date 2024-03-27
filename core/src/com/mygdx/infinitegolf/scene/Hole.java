@@ -58,7 +58,8 @@ public class Hole extends Scene {
     private TiledMap map;
     private OrthogonalTiledMapRenderer tmr;
     private String mapFile;
-    private int shotCounter = 0;
+    private int holeShotCounter = 0;
+    private int totalShotCounter = 0;
     private int par = 3;
     private Box2DDebugRenderer b2dr;
     private BitmapFont font;
@@ -170,18 +171,21 @@ public class Hole extends Scene {
                 arrowController.updatePosition(golfBallBody);
             }
 
-            if (shotCounter < par) {
+            if (holeShotCounter < par) {
                 font.setColor(Color.GREEN);
-            } else if (shotCounter == par) {
+            } else if (holeShotCounter == par) {
                 font.setColor(Color.YELLOW);
             } else {
                 font.setColor(Color.RED);
             }
-            font.draw(batch, String.valueOf(shotCounter), camera.viewportWidth / 2f + (camera.position.x - camera.viewportWidth / 2f), camera.viewportHeight / 2f + camera.position.y);
+            font.draw(batch, String.valueOf(holeShotCounter), camera.viewportWidth / 2f + (camera.position.x - camera.viewportWidth / 2f), camera.viewportHeight / 2f + camera.position.y);
         } else {
             font.getData().setScale(2);
-            font.draw(batch, "Hole # " + holeNumber + " finished in " + shotCounter + " shots",
+            font.draw(batch, "Hole # " + holeNumber + " finished in " + holeShotCounter + " shots",
                     camera.position.x - camera.viewportWidth / 2.5f, camera.viewportHeight / 1.5f);
+            font.getData().setScale(1);
+            font.draw(batch, "Press anything to continue",
+                    camera.position.x - camera.viewportWidth / 2.5f + 80, camera.viewportHeight / 1.5f - 35);
         }
         golfBallController.getBallSprite().draw(batch);
 
@@ -207,17 +211,32 @@ public class Hole extends Scene {
     }
 
     public void inputUpdate(float delta) {
-        if (Gdx.input.isKeyPressed((Input.Keys.LEFT)) && arrowController.getAngle() < 180) {
-            arrowController.increaseAngle();
-        }
-        if (Gdx.input.isKeyPressed((Input.Keys.RIGHT)) && arrowController.getAngle() > 0) {
-            arrowController.decreaseAngle();
-        }
-        if (Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
-            if (isBallStopped()) {
-                powerUp = powerBallController.powerUp(powerUp);
+        if (!isBallInHole) {
+            if (Gdx.input.isKeyPressed((Input.Keys.LEFT)) && arrowController.getAngle() < 180) {
+                arrowController.increaseAngle();
+            }
+            if (Gdx.input.isKeyPressed((Input.Keys.RIGHT)) && arrowController.getAngle() > 0) {
+                arrowController.decreaseAngle();
+            }
+            if (Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
+                if (isBallStopped()) {
+                    powerUp = powerBallController.powerUp(powerUp);
+                }
+            }
+        } else {
+            if (Gdx.input.isKeyPressed(Input.Keys.ANY_KEY) || Gdx.input.justTouched()) {
+                goToNewHole();
             }
         }
+    }
+
+    private void goToNewHole() {
+        holeNumber++;
+        isBallInHole = false;
+        totalShotCounter += holeShotCounter;
+        holeShotCounter = 0;
+        this.mapFile = "Maps/Hole" + holeNumber + ".tmx";
+        this.createHole();
     }
 
     private boolean isBallStopped() {
@@ -226,9 +245,9 @@ public class Hole extends Scene {
         float speedNow = golfBallBody.getLinearVelocity().len();
         recentSpeed = 0.1f * speedNow + 0.9f * recentSpeed;
         if (recentSpeed < speedThreshold) {
-            golfBallBody.setLinearVelocity(0,0);
+            golfBallBody.setLinearVelocity(0, 0);
             return true;
-        } else  {
+        } else {
             return false;
         }
     }
@@ -257,8 +276,7 @@ public class Hole extends Scene {
                 float verticalForce = getVerticalForce(arrowController.getAngle()) * powerBallController.getSize() / 5;
                 golfBallBody.applyForceToCenter(horizontalForce, verticalForce, false);
                 powerBallController.setSize(golfBallSize);
-                shotCounter++;
-                System.out.println(shotCounter);
+                holeShotCounter++;
             }
         }
     }
