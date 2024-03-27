@@ -44,6 +44,10 @@ public class ArrowView extends GameObjectView {
         arrowAngle -= 2;
     }
 
+    public void resetAngle() {
+        arrowAngle = 0;
+    }
+
     public float getAngle() {
         return arrowAngle;
     }

@@ -19,6 +19,7 @@ import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.CircleShape;
+import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
 import com.mygdx.infinitegolf.InputHandler;
@@ -143,8 +144,14 @@ public class Hole extends Scene {
         CircleShape shape = new CircleShape();
         shape.setRadius(((float) ballProperties.get("height") / 2) / PPM);
         golfBallBody.createFixture(shape, 5.0f);
+
+        FixtureDef fixtureDef = new FixtureDef();
+        fixtureDef.shape = shape;
+        fixtureDef.restitution = .5f; // Make it bounce a little bit
+        golfBallBody.createFixture(fixtureDef);
+
         shape.dispose();
-        float linearDamping = 1f;
+        float linearDamping = 0.9f;
         golfBallBody.setLinearDamping(linearDamping);
 
 
@@ -235,6 +242,7 @@ public class Hole extends Scene {
         isBallInHole = false;
         totalShotCounter += holeShotCounter;
         holeShotCounter = 0;
+        arrowView.resetAngle();
         this.mapFile = "Maps/Hole" + holeNumber + ".tmx";
         this.createHole();
     }
