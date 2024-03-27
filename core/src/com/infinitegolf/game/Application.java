@@ -73,7 +73,7 @@ public class Application extends ApplicationAdapter {
         ballTexture = new Texture("Images/GolfBall.png");
         arrowTexture = new Texture("Images/Arrow.png");
 
-        map = new TmxMapLoader().load("Maps/Hole1.tmx");
+        map = new TmxMapLoader().load("Maps/Hole5.tmx");
         tmr = new OrthogonalTiledMapRenderer(map); // Can pass in batch??? for shaders???
 
         TileObjectUtil.parseTileObjectLayer(world, map.getLayers().get("collision-layer").getObjects());
@@ -215,10 +215,9 @@ public class Application extends ApplicationAdapter {
     }
 
     private boolean isBallStopped() {
-        boolean isBallOnFloor = golfBall.getPosition().y < 6.33; //fixme: this value is hardcoded for map 1, may not work for others
-        boolean doesBallHaveNoVelocity = golfBall.getLinearVelocity().x <= 0.2 && golfBall.getLinearVelocity().y <= 0.2 &&
+//         boolean isBallOnFloor = golfBall.getPosition().y < 6.33; //fixme: this value is hardcoded for map 1, may not work for others
+        return golfBall.getLinearVelocity().x <= 0.2 && golfBall.getLinearVelocity().y <= 0.2 &&
                 golfBall.getLinearVelocity().x >= -0.2 && golfBall.getLinearVelocity().y >= -0.2;
-        return isBallOnFloor && doesBallHaveNoVelocity;
     }
 
     public void updateCamera(float delta) {
