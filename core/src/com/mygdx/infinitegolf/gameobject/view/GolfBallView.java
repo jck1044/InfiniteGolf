@@ -34,7 +34,7 @@ public class GolfBallView extends GameObjectView {
 
     public void updatePosition(Body golfBallBody) {
         ballAngle = golfBallBody.getAngle() * (180 / (float) Math.PI);
-        ballSprite.rotate(ballAngle);
+        ballSprite.setRotation(ballAngle);
         ballSprite.setX(golfBallBody.getPosition().x * PPM - ((float) texture.getWidth() / 2));
         ballSprite.setY(golfBallBody.getPosition().y * PPM - ((float) texture.getHeight() / 2));
     }
