@@ -221,10 +221,16 @@ public class Hole extends Scene {
     }
 
     private boolean isBallStopped() {
-//        boolean isBallOnFloor = golfBallBody.getPosition().y < 6.33; //fixme: this value is hardcoded for map 1, may not work for others
-        boolean doesBallHaveNoVelocity = golfBallBody.getLinearVelocity().x <= 0.2 && golfBallBody.getLinearVelocity().y <= 0.2 &&
-                golfBallBody.getLinearVelocity().x >= -0.2 && golfBallBody.getLinearVelocity().y >= -0.2;
-        return doesBallHaveNoVelocity;
+        float speedThreshold = .015f;
+        float recentSpeed = 0;
+        float speedNow = golfBallBody.getLinearVelocity().len();
+        recentSpeed = 0.1f * speedNow + 0.9f * recentSpeed;
+        if (recentSpeed < speedThreshold) {
+            golfBallBody.setLinearVelocity(0,0);
+            return true;
+        } else  {
+            return false;
+        }
     }
 
     public void updateCamera(float delta) {
