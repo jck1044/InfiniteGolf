@@ -143,8 +143,8 @@ public class Hole extends Scene {
         shape.setRadius(((float) ballProperties.get("height") / 2) / PPM);
         golfBallBody.createFixture(shape, 5.0f);
         shape.dispose();
-        float angularDamping = 10f;
-        golfBallBody.setAngularDamping(angularDamping);
+        float linearDamping = 1f;
+        golfBallBody.setLinearDamping(linearDamping);
 
 
 //        BackgroundElement backdrop = new BackgroundElement(new Vector2(), new Vector2(60F, 65F), BackgroundElementType.BACKDROP, (short)(2000));
@@ -165,11 +165,10 @@ public class Hole extends Scene {
         if (!isBallInHole) {
             if (!isBallStopped()) {
                 golfBallController.updatePosition(golfBallBody);
+            } else {
+                powerBallController.updatePosition(golfBallBody);
+                arrowController.updatePosition(golfBallBody);
             }
-            powerBallController.updatePosition(golfBallBody);
-            arrowController.updatePosition(golfBallBody);
-
-
 
             if (shotCounter < par) {
                 font.setColor(Color.GREEN);
@@ -222,22 +221,26 @@ public class Hole extends Scene {
     }
 
     private boolean isBallStopped() {
-        boolean isBallOnFloor = golfBallBody.getPosition().y < 6.33; //fixme: this value is hardcoded for map 1, may not work for others
+//        boolean isBallOnFloor = golfBallBody.getPosition().y < 6.33; //fixme: this value is hardcoded for map 1, may not work for others
         boolean doesBallHaveNoVelocity = golfBallBody.getLinearVelocity().x <= 0.2 && golfBallBody.getLinearVelocity().y <= 0.2 &&
                 golfBallBody.getLinearVelocity().x >= -0.2 && golfBallBody.getLinearVelocity().y >= -0.2;
-        return isBallOnFloor && doesBallHaveNoVelocity;
+        return doesBallHaveNoVelocity;
     }
 
     public void updateCamera(float delta) {
         Vector3 position = camera.position;
         position.x = golfBallBody.getPosition().x * PPM;
         position.y = (golfBallBody.getPosition().y + 3.1f) * PPM;
-        if (tmr != null) {
-
-        } else {
-            camera.position.set(position);
+        if (position.x - camera.viewportWidth / 2f < 0) {
+            position.x = camera.viewportWidth / 2f;
         }
-
+        if (position.x + camera.viewportWidth / 2f > 480) {
+            position.x = 480 - camera.viewportWidth / 2f;
+        }
+        if (position.y + camera.viewportHeight / 2f > 321) {
+            position.y = 321 - camera.viewportHeight / 2f;
+        }
+        camera.position.set(position);
         camera.update();
     }
 
