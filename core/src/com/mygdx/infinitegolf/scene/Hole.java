@@ -166,6 +166,7 @@ public class Hole extends Scene {
 
     public void pauseGame() {
         isPaused = true;
+        //fixme add pause screen
     }
 
     public void resumeGame() {
