@@ -11,6 +11,7 @@ public class DesktopLauncher {
         config.setForegroundFPS(60);
         config.setWindowedMode(1000, 667);
         config.setTitle("Infinite Golf");
+        config.setResizable(false);
         new Lwjgl3Application(new InfiniteGolf(), config);
     }
 }
