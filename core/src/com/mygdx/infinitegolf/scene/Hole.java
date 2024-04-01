@@ -187,6 +187,7 @@ public class Hole extends Scene {
             }
             font.draw(batch, String.valueOf(holeShotCounter), camera.viewportWidth / 2f + (camera.position.x - camera.viewportWidth / 2f), camera.viewportHeight / 2f + camera.position.y);
         } else {
+            golfBallBody.setLinearVelocity(0f,0f);
             font.getData().setScale(2);
             font.draw(batch, "Hole # " + holeNumber + " finished in " + holeShotCounter + " shots",
                     camera.position.x - camera.viewportWidth / 2.5f, camera.viewportHeight / 1.5f);
