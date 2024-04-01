@@ -231,6 +231,9 @@ public class Hole extends Scene {
                     powerUp = powerBallController.powerUp(powerUp);
                 }
             }
+            if (Gdx.input.isKeyPressed(Input.Keys.R)) {
+                this.createHole();
+            }
         } else {
             if (Gdx.input.isKeyPressed(Input.Keys.ANY_KEY) || Gdx.input.justTouched()) {
                 goToNewHole();
