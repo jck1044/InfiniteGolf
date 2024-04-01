@@ -86,7 +86,7 @@
   </object>
  </objectgroup>
  <objectgroup id="6" name="ball">
-  <object id="5" name="Ball" x="18" y="20" width="10" height="10">
+  <object id="5" name="Ball" x="18" y="10" width="10" height="10">
    <ellipse/>
   </object>
  </objectgroup>
