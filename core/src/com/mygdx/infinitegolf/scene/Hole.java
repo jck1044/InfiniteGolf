@@ -238,13 +238,21 @@ public class Hole extends Scene {
     }
 
     private void goToNewHole() {
-        holeNumber++;
-        isBallInHole = false;
-        totalShotCounter += holeShotCounter;
-        holeShotCounter = 0;
-        arrowView.resetAngle();
-        this.mapFile = "Maps/Hole" + holeNumber + ".tmx";
-        this.createHole();
+        if (holeNumber < 9) {
+            holeNumber++;
+            isBallInHole = false;
+            totalShotCounter += holeShotCounter;
+            holeShotCounter = 0;
+            arrowView.resetAngle();
+            this.mapFile = "Maps/Hole" + holeNumber + ".tmx";
+            this.createHole();
+        } else {
+            endGame();
+        }
+    }
+
+    private void endGame() {
+        System.exit(0); //fixme end game screen
     }
 
     private boolean isBallStopped() {
