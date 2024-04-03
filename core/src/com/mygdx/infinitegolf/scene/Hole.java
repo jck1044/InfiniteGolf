@@ -340,7 +340,8 @@ public class Hole extends Scene {
     public void updateGolfBallPosition(float delta) {
         if (!Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
             if (powerBallController.getSize() > golfBallSize) {
-                hitSound.play();
+                float volume = powerBallController.getSize() / 100;
+                hitSound.play(volume);
                 float horizontalForce = (90 - arrowController.getAngle()) * powerBallController.getSize() / 2.75f;
                 float verticalForce = getVerticalForce(arrowController.getAngle()) * powerBallController.getSize() / 2.75f;
                 golfBallBody.applyForceToCenter(horizontalForce, verticalForce, false);
