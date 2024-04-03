@@ -182,9 +182,8 @@ public class Hole extends Scene {
 
 
             if (!isBallInHole) {
-                if (!isBallStopped()) {
-                    golfBallController.updatePosition(golfBallBody);
-                } else {
+                golfBallController.updatePosition(golfBallBody);
+                if (isBallStopped()) {
                     powerBallController.updatePosition(golfBallBody);
                     arrowController.updatePosition(golfBallBody);
                 }
