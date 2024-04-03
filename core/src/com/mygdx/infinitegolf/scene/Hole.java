@@ -71,6 +71,8 @@ public class Hole extends Scene {
     private Body golfBallBody;
     private Boolean isBallInHole = false;
     private int holeNumber = 1;
+    private boolean isPaused = false;
+
 
     public Hole(Game game, String mapFile) { // Need to add a parameter for the map file
         this.game = game;
@@ -162,53 +164,65 @@ public class Hole extends Scene {
 //        this.addToGameObjectViews(backdropView);
     }
 
+    public void pauseGame() {
+        isPaused = true;
+        //fixme add pause screen
+    }
+
+    public void resumeGame() {
+        isPaused = false;
+    }
+
     @Override
     public void updateScene(float dt) {
         updatePhysics(dt);
+        if (!isPaused) {
+            tmr.render();
+            batch.begin();
 
-        tmr.render();
-        batch.begin();
 
+            if (!isBallInHole) {
+                if (!isBallStopped()) {
+                    golfBallController.updatePosition(golfBallBody);
+                } else {
+                    powerBallController.updatePosition(golfBallBody);
+                    arrowController.updatePosition(golfBallBody);
+                }
 
-        if (!isBallInHole) {
-            if (!isBallStopped()) {
-                golfBallController.updatePosition(golfBallBody);
+                if (holeShotCounter < par) {
+                    font.setColor(Color.GREEN);
+                } else if (holeShotCounter == par) {
+                    font.setColor(Color.YELLOW);
+                } else {
+                    font.setColor(Color.RED);
+                }
+                font.draw(batch, String.valueOf(holeShotCounter), camera.viewportWidth / 2f + (camera.position.x - camera.viewportWidth / 2f), camera.viewportHeight / 2f + camera.position.y);
             } else {
-                powerBallController.updatePosition(golfBallBody);
-                arrowController.updatePosition(golfBallBody);
+                golfBallBody.setLinearVelocity(0f, 0f);
+                font.getData().setScale(2);
+                font.draw(batch, "Hole # " + holeNumber + " finished in " + holeShotCounter + " shots",
+                        camera.position.x - camera.viewportWidth / 2.5f, camera.viewportHeight / 1.5f);
+                font.getData().setScale(1);
+                font.draw(batch, "Press anything to continue",
+                        camera.position.x - camera.viewportWidth / 2.5f + 80, camera.viewportHeight / 1.5f - 35);
             }
+            golfBallController.getBallSprite().draw(batch);
 
-            if (holeShotCounter < par) {
-                font.setColor(Color.GREEN);
-            } else if (holeShotCounter == par) {
-                font.setColor(Color.YELLOW);
-            } else {
-                font.setColor(Color.RED);
-            }
-            font.draw(batch, String.valueOf(holeShotCounter), camera.viewportWidth / 2f + (camera.position.x - camera.viewportWidth / 2f), camera.viewportHeight / 2f + camera.position.y);
-        } else {
-            font.getData().setScale(2);
-            font.draw(batch, "Hole # " + holeNumber + " finished in " + holeShotCounter + " shots",
-                    camera.position.x - camera.viewportWidth / 2.5f, camera.viewportHeight / 1.5f);
-            font.getData().setScale(1);
-            font.draw(batch, "Press anything to continue",
-                    camera.position.x - camera.viewportWidth / 2.5f + 80, camera.viewportHeight / 1.5f - 35);
+            batch.end();
         }
-        golfBallController.getBallSprite().draw(batch);
-
-        batch.end();
-
     }
 
     public void updatePhysics(float dt) {
-        b2dr.render(world, camera.combined.scl(PPM));
-        world.step(1 / 60f, 6, 2);
         inputUpdate(dt);
-        updateGolfBallPosition(dt);
-        updateCamera(dt);
-        checkIfBallInHole(dt);
-        tmr.setView(camera);
-        batch.setProjectionMatrix(camera.combined);
+        if (!isPaused) {
+            b2dr.render(world, camera.combined.scl(PPM));
+            world.step(1 / 60f, 6, 2);
+            updateGolfBallPosition(dt);
+            updateCamera(dt);
+            checkIfBallInHole(dt);
+            tmr.setView(camera);
+            batch.setProjectionMatrix(camera.combined);
+        }
     }
 
     private void checkIfBallInHole(float dt) {
@@ -230,6 +244,21 @@ public class Hole extends Scene {
                     powerUp = powerBallController.powerUp(powerUp);
                 }
             }
+            if (Gdx.input.isKeyPressed(Input.Keys.R)) {
+                this.createHole();
+            }
+            if (Gdx.input.isKeyPressed(Input.Keys.P)) {
+                if (isPaused) {
+                    resumeGame();
+                } else {
+                    pauseGame();
+                }
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+            }
         } else {
             if (Gdx.input.isKeyPressed(Input.Keys.ANY_KEY) || Gdx.input.justTouched()) {
                 goToNewHole();
@@ -238,13 +267,21 @@ public class Hole extends Scene {
     }
 
     private void goToNewHole() {
-        holeNumber++;
-        isBallInHole = false;
-        totalShotCounter += holeShotCounter;
-        holeShotCounter = 0;
-        arrowView.resetAngle();
-        this.mapFile = "Maps/Hole" + holeNumber + ".tmx";
-        this.createHole();
+        if (holeNumber < 9) {
+            holeNumber++;
+            isBallInHole = false;
+            totalShotCounter += holeShotCounter;
+            holeShotCounter = 0;
+            arrowView.resetAngle();
+            this.mapFile = "Maps/Hole" + holeNumber + ".tmx";
+            this.createHole();
+        } else {
+            endGame();
+        }
+    }
+
+    private void endGame() {
+        System.exit(0); //fixme end game screen
     }
 
     private boolean isBallStopped() {
