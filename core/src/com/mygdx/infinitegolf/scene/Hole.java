@@ -164,6 +164,10 @@ public class Hole extends Scene {
 //        this.addToGameObjectViews(backdropView);
     }
 
+    @Override
+    public void render(float dt) {
+        this.updateScene(dt);
+    }
     public void pauseGame() {
         isPaused = true;
         //fixme add pause screen
