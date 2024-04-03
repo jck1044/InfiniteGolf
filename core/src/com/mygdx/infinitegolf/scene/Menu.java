@@ -61,6 +61,7 @@ public class Menu extends Scene {
 
         backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal("Music/Menu.mp3"));
         backgroundMusic.setLooping(true);
+        backgroundMusic.setVolume(0.5f);
         backgroundMusic.play();
 
 
@@ -68,7 +69,6 @@ public class Menu extends Scene {
         Gdx.input.setInputProcessor(stage);
 
         skin = new Skin(Gdx.files.internal("Skins/uiskin.json"));
-
 
         Texture backgroundTexture = new Texture(Gdx.files.internal("Images/Menu.jpg"));
         Image backgroundImage = new Image(backgroundTexture);
