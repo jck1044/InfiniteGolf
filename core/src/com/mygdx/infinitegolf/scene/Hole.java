@@ -154,6 +154,12 @@ public class Hole extends Scene {
 //        this.addToGameObjectViews(backdropView);
     }
 
+
+    @Override
+    public void render(float dt) {
+        this.updateScene(dt);
+    }
+
     @Override
     public void updateScene(float dt) {
         updatePhysics(dt);
