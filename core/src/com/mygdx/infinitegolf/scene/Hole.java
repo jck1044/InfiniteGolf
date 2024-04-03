@@ -73,8 +73,9 @@ public class Hole extends Scene {
     private Boolean isBallInHole = false;
     private int holeNumber = 1;
     private boolean isPaused = false;
-
+    private boolean playInHoleSoundOnce = false;
     private Sound hitSound;
+    private Sound inHoleSound;
 
 
     public Hole(Game game, String mapFile) { // Need to add a parameter for the map file
@@ -90,6 +91,9 @@ public class Hole extends Scene {
 
         float w = Gdx.graphics.getWidth();
         float h = Gdx.graphics.getHeight();
+
+        hitSound = Gdx.audio.newSound(Gdx.files.internal("Music/hit.mp3"));
+        inHoleSound = Gdx.audio.newSound(Gdx.files.internal("Music/inHole.mp3"));
 
         camera = new OrthographicCamera();
         camera.setToOrtho(false, w / SCALE, h / SCALE); //From YT
@@ -171,6 +175,7 @@ public class Hole extends Scene {
     public void render(float dt) {
         this.updateScene(dt);
     }
+
     public void pauseGame() {
         isPaused = true;
         //fixme add pause screen
@@ -204,6 +209,10 @@ public class Hole extends Scene {
                 }
                 font.draw(batch, String.valueOf(holeShotCounter), camera.viewportWidth / 2f + (camera.position.x - camera.viewportWidth / 2f), camera.viewportHeight / 2f + camera.position.y);
             } else {
+                if (!playInHoleSoundOnce) {
+                    inHoleSound.play();
+                    playInHoleSoundOnce = true;
+                }
                 golfBallBody.setLinearVelocity(0f, 0f);
                 font.getData().setScale(2);
                 font.draw(batch, "Hole # " + holeNumber + " finished in " + holeShotCounter + " shots",
@@ -330,7 +339,6 @@ public class Hole extends Scene {
     public void updateGolfBallPosition(float delta) {
         if (!Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
             if (powerBallController.getSize() > golfBallSize) {
-                hitSound = Gdx.audio.newSound(Gdx.files.internal("Music/hit.mp3"));
                 hitSound.play();
                 float horizontalForce = (90 - arrowController.getAngle()) * powerBallController.getSize() / 2.75f;
                 float verticalForce = getVerticalForce(arrowController.getAngle()) * powerBallController.getSize() / 2.75f;
