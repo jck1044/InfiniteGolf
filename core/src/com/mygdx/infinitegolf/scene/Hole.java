@@ -62,7 +62,7 @@ public class Hole extends Scene {
     private String mapFile;
     private int holeShotCounter = 0;
     private int totalShotCounter = 0;
-    private int par = 3;
+    private final int[] parValues = {2, 2, 3, 3, 4, 3, 2, 6, 5};
     private Box2DDebugRenderer b2dr;
     private BitmapFont font;
 
@@ -200,9 +200,9 @@ public class Hole extends Scene {
                     arrowController.updatePosition(golfBallBody);
                 }
 
-                if (holeShotCounter < par) {
+                if (holeShotCounter < parValues[holeNumber - 1]) {
                     font.setColor(Color.GREEN);
-                } else if (holeShotCounter == par) {
+                } else if (holeShotCounter == parValues[holeNumber - 1]) {
                     font.setColor(Color.YELLOW);
                 } else {
                     font.setColor(Color.RED);
