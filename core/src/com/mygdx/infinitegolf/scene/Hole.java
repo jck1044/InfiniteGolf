@@ -249,11 +249,18 @@ public class Hole extends Scene {
 
     private boolean isBallStopped() {
         float speedThreshold = .015f;
-        float recentSpeed = 0;
-        float speedNow = golfBallBody.getLinearVelocity().len();
-        recentSpeed = 0.1f * speedNow + 0.9f * recentSpeed;
-        if (recentSpeed < speedThreshold) {
+        float angularThreshold = .015f;
+        float recentLinear = 0;
+        float linearNow = golfBallBody.getLinearVelocity().len();
+        recentLinear = 0.1f * linearNow + 0.9f * recentLinear;
+
+        float recentAngular = 0;
+        float angularNow = golfBallBody.getAngularVelocity();
+        recentAngular = 0.1f * angularNow + 0.9f * recentAngular;
+
+        if (recentLinear < speedThreshold && recentAngular < angularThreshold) {
             golfBallBody.setLinearVelocity(0, 0);
+            golfBallBody.setAngularVelocity(0);
             return true;
         } else {
             return false;
