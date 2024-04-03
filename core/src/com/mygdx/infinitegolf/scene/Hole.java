@@ -282,13 +282,13 @@ public class Hole extends Scene {
     }
 
     private void goToNewHole() {
+        playInHoleSoundOnce = false;
+        isBallInHole = false;
+        totalShotCounter += holeShotCounter;
+        holeShotCounter = 0;
+        arrowView.resetAngle();
         if (holeNumber < 9) {
-            playInHoleSoundOnce = false;
             holeNumber++;
-            isBallInHole = false;
-            totalShotCounter += holeShotCounter;
-            holeShotCounter = 0;
-            arrowView.resetAngle();
             this.mapFile = "Maps/Hole" + holeNumber + ".tmx";
             this.createHole();
         } else {
