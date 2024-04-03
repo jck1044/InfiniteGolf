@@ -5,6 +5,7 @@ import static Utils.Constants.PPM;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -72,6 +73,8 @@ public class Hole extends Scene {
     private Boolean isBallInHole = false;
     private int holeNumber = 1;
     private boolean isPaused = false;
+
+    private Sound hitSound;
 
 
     public Hole(Game game, String mapFile) { // Need to add a parameter for the map file
@@ -327,6 +330,8 @@ public class Hole extends Scene {
     public void updateGolfBallPosition(float delta) {
         if (!Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
             if (powerBallController.getSize() > golfBallSize) {
+                hitSound = Gdx.audio.newSound(Gdx.files.internal("Music/hit.mp3"));
+                hitSound.play();
                 float horizontalForce = (90 - arrowController.getAngle()) * powerBallController.getSize() / 2.75f;
                 float verticalForce = getVerticalForce(arrowController.getAngle()) * powerBallController.getSize() / 2.75f;
                 golfBallBody.applyForceToCenter(horizontalForce, verticalForce, false);
