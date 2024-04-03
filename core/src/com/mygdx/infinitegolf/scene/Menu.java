@@ -126,7 +126,7 @@ public class Menu extends Scene {
                 hole = new Hole(game, "Maps/Hole1.tmx");
                 hole.initScene();
                 game.setScreen(hole);
-                backgroundMusic.dispose();
+                backgroundMusic.setVolume(0.25f);
             }
         });
 
