@@ -10,13 +10,16 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.mygdx.infinitegolf.gameobject.controller.GolfBallController;
@@ -78,32 +81,42 @@ public class Menu extends Scene {
         Image titleImage = new Image (titleTexture);
         titleImage.setSize(750, 100);
 
-        TextButton playButton = new TextButton("Play", skin, "default");
-        TextButton optionsButton = new TextButton("Options", skin, "default");
-        TextButton exitButton = new TextButton("Exit", skin, "default");
+        Texture playButtonTexture = new Texture(Gdx.files.internal("Images/PlayButton.png"));
+        TextureRegion playButtonRegion = new TextureRegion(playButtonTexture);
+        ImageButton.ImageButtonStyle playButtonStyle = new ImageButton.ImageButtonStyle();
+        playButtonStyle.imageUp = new TextureRegionDrawable(playButtonRegion);
+        playButtonStyle.imageDown = new TextureRegionDrawable(playButtonRegion);
+        final ImageButton playButton = new ImageButton(playButtonStyle);
 
-        float buttonWidth = 200;
-        float buttonHeight = 50;
+        Texture optionsButtonTexture = new Texture(Gdx.files.internal("Images/OptionsButton.png"));
+        TextureRegion optionsButtonRegion = new TextureRegion(optionsButtonTexture);
+        ImageButton.ImageButtonStyle optionsButtonStyle = new ImageButton.ImageButtonStyle();
+        optionsButtonStyle.imageUp = new TextureRegionDrawable(optionsButtonRegion);
+        optionsButtonStyle.imageDown = new TextureRegionDrawable(optionsButtonRegion);
+        final ImageButton optionsButton = new ImageButton(optionsButtonStyle);
+
+        Texture quitButtonTexture = new Texture(Gdx.files.internal("Images/QuitButton.png"));
+        TextureRegion quitButtonRegion = new TextureRegion(quitButtonTexture);
+        ImageButton.ImageButtonStyle quitButtonStyle = new ImageButton.ImageButtonStyle();
+        quitButtonStyle.imageUp = new TextureRegionDrawable(quitButtonRegion);
+        optionsButtonStyle.imageDown = new TextureRegionDrawable(quitButtonRegion);
+        final ImageButton quitButton = new ImageButton(quitButtonStyle);
+
+        float buttonWidth = 250;
+        float buttonHeight = 200;
         playButton.setWidth(buttonWidth);
         playButton.setHeight(buttonHeight);
         optionsButton.setWidth(buttonWidth);
         optionsButton.setHeight(buttonHeight);
-        exitButton.setWidth(buttonWidth);
-        exitButton.setHeight(buttonHeight);
-
-
-        Color cornflowerBlue = new Color(0x6495EDFF);
-
-        playButton.setColor(cornflowerBlue);
-        optionsButton.setColor(cornflowerBlue);
-        exitButton.setColor(cornflowerBlue);
+        quitButton.setWidth(buttonWidth);
+        quitButton.setHeight(buttonHeight);
 
         float centerX = w / 2f;
 
         titleImage.setPosition(centerX - titleImage.getWidth() / 2f, 500);
-        playButton.setPosition(centerX - playButton.getWidth() / 2f, 400);
-        optionsButton.setPosition(centerX - optionsButton.getWidth() / 2f, 300);
-        exitButton.setPosition(centerX - exitButton.getWidth() / 2f, 200);
+        playButton.setPosition(centerX - playButton.getWidth() / 2f, 300);
+        optionsButton.setPosition(centerX - optionsButton.getWidth() / 2f, 150);
+        quitButton.setPosition(centerX - quitButton.getWidth() / 2f, 0);
 
 
         // Add listeners to buttons
@@ -125,7 +138,7 @@ public class Menu extends Scene {
             }
         });
 
-        exitButton.addListener(new ClickListener() {
+        quitButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 // Handle exit button click
@@ -137,7 +150,7 @@ public class Menu extends Scene {
         stage.addActor(titleImage);
         stage.addActor(playButton);
         stage.addActor(optionsButton);
-        stage.addActor(exitButton);
+        stage.addActor(quitButton);
 
     }
 
