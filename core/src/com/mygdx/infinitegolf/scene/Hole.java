@@ -62,7 +62,7 @@ public class Hole extends Scene {
     private String mapFile;
     private int holeShotCounter = 0;
     private int totalShotCounter = 0;
-    private int par = 3;
+    private final int[] parValues = {2, 2, 3, 3, 4, 3, 2, 6, 5};
     private Box2DDebugRenderer b2dr;
     private BitmapFont font;
 
@@ -200,9 +200,9 @@ public class Hole extends Scene {
                     arrowController.updatePosition(golfBallBody);
                 }
 
-                if (holeShotCounter < par) {
+                if (holeShotCounter < parValues[holeNumber - 1]) {
                     font.setColor(Color.GREEN);
-                } else if (holeShotCounter == par) {
+                } else if (holeShotCounter == parValues[holeNumber - 1]) {
                     font.setColor(Color.YELLOW);
                 } else {
                     font.setColor(Color.RED);
@@ -282,12 +282,13 @@ public class Hole extends Scene {
     }
 
     private void goToNewHole() {
+        playInHoleSoundOnce = false;
+        isBallInHole = false;
+        totalShotCounter += holeShotCounter;
+        holeShotCounter = 0;
+        arrowView.resetAngle();
         if (holeNumber < 9) {
             holeNumber++;
-            isBallInHole = false;
-            totalShotCounter += holeShotCounter;
-            holeShotCounter = 0;
-            arrowView.resetAngle();
             this.mapFile = "Maps/Hole" + holeNumber + ".tmx";
             this.createHole();
         } else {
@@ -339,7 +340,8 @@ public class Hole extends Scene {
     public void updateGolfBallPosition(float delta) {
         if (!Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
             if (powerBallController.getSize() > golfBallSize) {
-                hitSound.play();
+                float volume = powerBallController.getSize() / 100;
+                hitSound.play(volume);
                 float horizontalForce = (90 - arrowController.getAngle()) * powerBallController.getSize() / 2.75f;
                 float verticalForce = getVerticalForce(arrowController.getAngle()) * powerBallController.getSize() / 2.75f;
                 golfBallBody.applyForceToCenter(horizontalForce, verticalForce, false);
