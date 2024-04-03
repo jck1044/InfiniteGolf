@@ -283,6 +283,7 @@ public class Hole extends Scene {
 
     private void goToNewHole() {
         if (holeNumber < 9) {
+            playInHoleSoundOnce = false;
             holeNumber++;
             isBallInHole = false;
             totalShotCounter += holeShotCounter;
