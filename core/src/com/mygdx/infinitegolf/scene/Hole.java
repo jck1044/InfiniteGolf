@@ -19,6 +19,7 @@ import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.CircleShape;
+import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
 import com.mygdx.infinitegolf.InputHandler;
@@ -58,7 +59,8 @@ public class Hole extends Scene {
     private TiledMap map;
     private OrthogonalTiledMapRenderer tmr;
     private String mapFile;
-    private int shotCounter = 0;
+    private int holeShotCounter = 0;
+    private int totalShotCounter = 0;
     private int par = 3;
     private Box2DDebugRenderer b2dr;
     private BitmapFont font;
@@ -69,6 +71,8 @@ public class Hole extends Scene {
     private Body golfBallBody;
     private Boolean isBallInHole = false;
     private int holeNumber = 1;
+    private boolean isPaused = false;
+
 
     public Hole(Game game, String mapFile) { // Need to add a parameter for the map file
         this.game = game;
@@ -142,8 +146,14 @@ public class Hole extends Scene {
         CircleShape shape = new CircleShape();
         shape.setRadius(((float) ballProperties.get("height") / 2) / PPM);
         golfBallBody.createFixture(shape, 5.0f);
+
+        FixtureDef fixtureDef = new FixtureDef();
+        fixtureDef.shape = shape;
+        fixtureDef.restitution = .5f; // Make it bounce a little bit
+        golfBallBody.createFixture(fixtureDef);
+
         shape.dispose();
-        float linearDamping = 1f;
+        float linearDamping = 0.9f;
         golfBallBody.setLinearDamping(linearDamping);
 
 
@@ -154,56 +164,68 @@ public class Hole extends Scene {
 //        this.addToGameObjectViews(backdropView);
     }
 
-
     @Override
     public void render(float dt) {
         this.updateScene(dt);
+    }
+    public void pauseGame() {
+        isPaused = true;
+        //fixme add pause screen
+    }
+
+    public void resumeGame() {
+        isPaused = false;
     }
 
     @Override
     public void updateScene(float dt) {
         updatePhysics(dt);
+        if (!isPaused) {
+            tmr.render();
+            batch.begin();
 
-        tmr.render();
-        batch.begin();
 
-
-        if (!isBallInHole) {
-            if (!isBallStopped()) {
+            if (!isBallInHole) {
                 golfBallController.updatePosition(golfBallBody);
-            } else {
-                powerBallController.updatePosition(golfBallBody);
-                arrowController.updatePosition(golfBallBody);
-            }
+                if (isBallStopped()) {
+                    powerBallController.updatePosition(golfBallBody);
+                    arrowController.updatePosition(golfBallBody);
+                }
 
-            if (shotCounter < par) {
-                font.setColor(Color.GREEN);
-            } else if (shotCounter == par) {
-                font.setColor(Color.YELLOW);
+                if (holeShotCounter < par) {
+                    font.setColor(Color.GREEN);
+                } else if (holeShotCounter == par) {
+                    font.setColor(Color.YELLOW);
+                } else {
+                    font.setColor(Color.RED);
+                }
+                font.draw(batch, String.valueOf(holeShotCounter), camera.viewportWidth / 2f + (camera.position.x - camera.viewportWidth / 2f), camera.viewportHeight / 2f + camera.position.y);
             } else {
-                font.setColor(Color.RED);
+                golfBallBody.setLinearVelocity(0f, 0f);
+                font.getData().setScale(2);
+                font.draw(batch, "Hole # " + holeNumber + " finished in " + holeShotCounter + " shots",
+                        camera.position.x - camera.viewportWidth / 2.5f, camera.viewportHeight / 1.5f);
+                font.getData().setScale(1);
+                font.draw(batch, "Press anything to continue",
+                        camera.position.x - camera.viewportWidth / 2.5f + 80, camera.viewportHeight / 1.5f - 35);
             }
-            font.draw(batch, String.valueOf(shotCounter), camera.viewportWidth / 2f + (camera.position.x - camera.viewportWidth / 2f), camera.viewportHeight / 2f + camera.position.y);
-        } else {
-            font.getData().setScale(2);
-            font.draw(batch, "Hole # " + holeNumber + " finished in " + shotCounter + " shots",
-                    camera.position.x - camera.viewportWidth / 2.5f, camera.viewportHeight / 1.5f);
+            golfBallController.getBallSprite().draw(batch);
+
+            batch.end();
         }
-        golfBallController.getBallSprite().draw(batch);
-
-        batch.end();
-
     }
 
     public void updatePhysics(float dt) {
-        b2dr.render(world, camera.combined.scl(PPM));
-        world.step(1 / 60f, 6, 2);
         inputUpdate(dt);
-        updateGolfBallPosition(dt);
-        updateCamera(dt);
-        checkIfBallInHole(dt);
-        tmr.setView(camera);
-        batch.setProjectionMatrix(camera.combined);
+        if (!isPaused) {
+            b2dr.render(world, camera.combined.scl(PPM));
+            world.step(1 / 60f, 6, 2);
+            updateGolfBallPosition(dt);
+            updateCamera(dt);
+            checkIfBallInHole(dt);
+            tmr.setView(camera);
+            batch.setProjectionMatrix(camera.combined);
+        }
     }
 
     private void checkIfBallInHole(float dt) {
@@ -213,28 +235,74 @@ public class Hole extends Scene {
     }
 
     public void inputUpdate(float delta) {
-        if (Gdx.input.isKeyPressed((Input.Keys.LEFT)) && arrowController.getAngle() < 180) {
-            arrowController.increaseAngle();
-        }
-        if (Gdx.input.isKeyPressed((Input.Keys.RIGHT)) && arrowController.getAngle() > 0) {
-            arrowController.decreaseAngle();
-        }
-        if (Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
-            if (isBallStopped()) {
-                powerUp = powerBallController.powerUp(powerUp);
+        if (!isBallInHole) {
+            if (Gdx.input.isKeyPressed((Input.Keys.LEFT)) && arrowController.getAngle() < 180) {
+                arrowController.increaseAngle();
+            }
+            if (Gdx.input.isKeyPressed((Input.Keys.RIGHT)) && arrowController.getAngle() > 0) {
+                arrowController.decreaseAngle();
+            }
+            if (Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
+                if (isBallStopped()) {
+                    powerUp = powerBallController.powerUp(powerUp);
+                }
+            }
+            if (Gdx.input.isKeyPressed(Input.Keys.R)) {
+                this.createHole();
+            }
+            if (Gdx.input.isKeyPressed(Input.Keys.P)) {
+                if (isPaused) {
+                    resumeGame();
+                } else {
+                    pauseGame();
+                }
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        } else {
+            if (Gdx.input.isKeyPressed(Input.Keys.ANY_KEY) || Gdx.input.justTouched()) {
+                goToNewHole();
             }
         }
     }
 
+    private void goToNewHole() {
+        if (holeNumber < 9) {
+            holeNumber++;
+            isBallInHole = false;
+            totalShotCounter += holeShotCounter;
+            holeShotCounter = 0;
+            arrowView.resetAngle();
+            this.mapFile = "Maps/Hole" + holeNumber + ".tmx";
+            this.createHole();
+        } else {
+            endGame();
+        }
+    }
+
+    private void endGame() {
+        System.exit(0); //fixme end game screen
+    }
+
     private boolean isBallStopped() {
         float speedThreshold = .015f;
-        float recentSpeed = 0;
-        float speedNow = golfBallBody.getLinearVelocity().len();
-        recentSpeed = 0.1f * speedNow + 0.9f * recentSpeed;
-        if (recentSpeed < speedThreshold) {
-            golfBallBody.setLinearVelocity(0,0);
+        float angularThreshold = .015f;
+        float recentLinear = 0;
+        float linearNow = golfBallBody.getLinearVelocity().len();
+        recentLinear = 0.1f * linearNow + 0.9f * recentLinear;
+
+        float recentAngular = 0;
+        float angularNow = golfBallBody.getAngularVelocity();
+        recentAngular = 0.1f * angularNow + 0.9f * recentAngular;
+
+        if (recentLinear < speedThreshold && recentAngular < angularThreshold) {
+            golfBallBody.setLinearVelocity(0, 0);
+            golfBallBody.setAngularVelocity(0);
             return true;
-        } else  {
+        } else {
             return false;
         }
     }
@@ -259,12 +327,11 @@ public class Hole extends Scene {
     public void updateGolfBallPosition(float delta) {
         if (!Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
             if (powerBallController.getSize() > golfBallSize) {
-                float horizontalForce = (90 - arrowController.getAngle()) * powerBallController.getSize() / 3;
-                float verticalForce = getVerticalForce(arrowController.getAngle()) * powerBallController.getSize() / 5;
+                float horizontalForce = (90 - arrowController.getAngle()) * powerBallController.getSize() / 2.75f;
+                float verticalForce = getVerticalForce(arrowController.getAngle()) * powerBallController.getSize() / 2.75f;
                 golfBallBody.applyForceToCenter(horizontalForce, verticalForce, false);
                 powerBallController.setSize(golfBallSize);
-                shotCounter++;
-                System.out.println(shotCounter);
+                holeShotCounter++;
             }
         }
     }
