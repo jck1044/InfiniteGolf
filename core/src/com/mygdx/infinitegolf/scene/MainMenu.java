@@ -3,37 +3,23 @@ package com.mygdx.infinitegolf.scene;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Music;
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Colors;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
-import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
-import com.mygdx.infinitegolf.gameobject.controller.GolfBallController;
-import com.mygdx.infinitegolf.gameobject.model.BackgroundElementModel;
-import com.mygdx.infinitegolf.gameobject.model.GolfBallModel;
-import com.mygdx.infinitegolf.gameobject.view.GolfBallView;
-import com.mygdx.infinitegolf.gameobject.view.GameObjectView;
 import com.mygdx.infinitegolf.utils.Assets;
 
-import java.awt.Font;
-import java.util.SortedMap;
 import java.util.TreeMap;
 
-public class Menu extends Scene {
+public class MainMenu extends Scene {
 
     private Game game;
 
@@ -45,7 +31,7 @@ public class Menu extends Scene {
 
     private Texture titleTexture;
 
-    public Menu(Game game) {
+    public MainMenu(Game game) {
         this.game = game;
     }
 
