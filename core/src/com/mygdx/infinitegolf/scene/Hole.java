@@ -5,6 +5,7 @@ import static Utils.Constants.PPM;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -22,12 +23,18 @@ import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
+import com.mongodb.client.MongoClient;
+import com.mongodb.client.MongoClients;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoCursor;
+import com.mongodb.client.MongoDatabase;
 import com.mygdx.infinitegolf.InputHandler;
 import com.mygdx.infinitegolf.gameobject.controller.ArrowController;
 import com.mygdx.infinitegolf.gameobject.controller.GolfBallController;
 import com.mygdx.infinitegolf.gameobject.controller.PowerBallController;
 import com.mygdx.infinitegolf.gameobject.model.ArrowModel;
 import com.mygdx.infinitegolf.gameobject.model.GolfBallModel;
+import com.mygdx.infinitegolf.gameobject.model.PlayerModel;
 import com.mygdx.infinitegolf.gameobject.model.PowerBallModel;
 import com.mygdx.infinitegolf.gameobject.view.ArrowView;
 import com.mygdx.infinitegolf.gameobject.view.GolfBallView;
@@ -35,6 +42,12 @@ import com.mygdx.infinitegolf.gameobject.view.GameObjectView;
 import com.mygdx.infinitegolf.gameobject.view.PowerBallView;
 import com.mygdx.infinitegolf.utils.Assets;
 
+import org.bson.Document;
+
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Scanner;
 import java.util.TreeMap;
 
 import Utils.TileObjectUtil;
@@ -61,7 +74,7 @@ public class Hole extends Scene {
     private String mapFile;
     private int holeShotCounter = 0;
     private int totalShotCounter = 0;
-    private int par = 3;
+    private final int[] parValues = {2, 2, 3, 3, 4, 3, 2, 6, 5};
     private Box2DDebugRenderer b2dr;
     private BitmapFont font;
 
@@ -72,6 +85,9 @@ public class Hole extends Scene {
     private Boolean isBallInHole = false;
     private int holeNumber = 1;
     private boolean isPaused = false;
+    private boolean playInHoleSoundOnce = false;
+    private Sound hitSound;
+    private Sound inHoleSound;
 
 
     public Hole(Game game, String mapFile) { // Need to add a parameter for the map file
@@ -87,6 +103,9 @@ public class Hole extends Scene {
 
         float w = Gdx.graphics.getWidth();
         float h = Gdx.graphics.getHeight();
+
+        hitSound = Gdx.audio.newSound(Gdx.files.internal("Music/hit.mp3"));
+        inHoleSound = Gdx.audio.newSound(Gdx.files.internal("Music/inHole.mp3"));
 
         camera = new OrthographicCamera();
         camera.setToOrtho(false, w / SCALE, h / SCALE); //From YT
@@ -168,6 +187,7 @@ public class Hole extends Scene {
     public void render(float dt) {
         this.updateScene(dt);
     }
+
     public void pauseGame() {
         isPaused = true;
         //fixme add pause screen
@@ -192,15 +212,19 @@ public class Hole extends Scene {
                     arrowController.updatePosition(golfBallBody);
                 }
 
-                if (holeShotCounter < par) {
+                if (holeShotCounter < parValues[holeNumber - 1]) {
                     font.setColor(Color.GREEN);
-                } else if (holeShotCounter == par) {
+                } else if (holeShotCounter == parValues[holeNumber - 1]) {
                     font.setColor(Color.YELLOW);
                 } else {
                     font.setColor(Color.RED);
                 }
                 font.draw(batch, String.valueOf(holeShotCounter), camera.viewportWidth / 2f + (camera.position.x - camera.viewportWidth / 2f), camera.viewportHeight / 2f + camera.position.y);
             } else {
+                if (!playInHoleSoundOnce) {
+                    inHoleSound.play();
+                    playInHoleSoundOnce = true;
+                }
                 golfBallBody.setLinearVelocity(0f, 0f);
                 font.getData().setScale(2);
                 font.draw(batch, "Hole # " + holeNumber + " finished in " + holeShotCounter + " shots",
@@ -270,12 +294,13 @@ public class Hole extends Scene {
     }
 
     private void goToNewHole() {
+        playInHoleSoundOnce = false;
+        isBallInHole = false;
+        totalShotCounter += holeShotCounter;
+        holeShotCounter = 0;
+        arrowView.resetAngle();
         if (holeNumber < 9) {
             holeNumber++;
-            isBallInHole = false;
-            totalShotCounter += holeShotCounter;
-            holeShotCounter = 0;
-            arrowView.resetAngle();
             this.mapFile = "Maps/Hole" + holeNumber + ".tmx";
             this.createHole();
         } else {
@@ -284,7 +309,26 @@ public class Hole extends Scene {
     }
 
     private void endGame() {
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Enter your name to be added to the leaderboard: ");
+        String name = scanner.nextLine();
+        addScoreToDB(totalShotCounter, name);
+        printLeaderboard();
+        scanner.close();
         System.exit(0); //fixme end game screen
+    }
+
+    private void printLeaderboard() {
+        List<PlayerModel> leaderboard = getScoresFromDB();
+        System.out.println("LEADERBOARD:");
+        int counter = 1;
+        for (PlayerModel player : leaderboard) {
+            if (counter > 10) {
+                break;
+            }
+            System.out.println(counter + ": " + player.getName() + " - " + player.getScore());
+            counter++;
+        }
     }
 
     private boolean isBallStopped() {
@@ -327,6 +371,8 @@ public class Hole extends Scene {
     public void updateGolfBallPosition(float delta) {
         if (!Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
             if (powerBallController.getSize() > golfBallSize) {
+                float volume = powerBallController.getSize() / 100;
+                hitSound.play(volume);
                 float horizontalForce = (90 - arrowController.getAngle()) * powerBallController.getSize() / 2.75f;
                 float verticalForce = getVerticalForce(arrowController.getAngle()) * powerBallController.getSize() / 2.75f;
                 golfBallBody.applyForceToCenter(horizontalForce, verticalForce, false);
@@ -361,4 +407,38 @@ public class Hole extends Scene {
         Assets.loadAll();
     }
 
+    private void addScoreToDB(int score, String name) {
+        @SuppressWarnings("AuthLeak") String uri = "mongodb+srv://InfiniteGolfDev:InfiniteGolfDev@cluster0.ilveng7.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
+        try (MongoClient mongoClient = MongoClients.create(uri)) {
+            MongoDatabase database = mongoClient.getDatabase("golfScores");
+            MongoCollection<Document> collection = database.getCollection("golfScores");
+            // Create a document with the number field
+            Document doc = new Document("name", name).append("score", score);
+            // Insert the document into the collection
+            collection.insertOne(doc);
+            System.out.println("Number inserted successfully.");
+        }
+    }
+
+    @SuppressWarnings("NewApi")
+    private List<PlayerModel> getScoresFromDB() {
+        @SuppressWarnings("AuthLeak") String uri = "mongodb+srv://InfiniteGolfDev:InfiniteGolfDev@cluster0.ilveng7.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
+        List<PlayerModel> leaderboard = new ArrayList<>();
+        try (MongoClient mongoClient = MongoClients.create(uri)) {
+            MongoDatabase database = mongoClient.getDatabase("golfScores");
+            MongoCollection<Document> collection = database.getCollection("golfScores");
+            try (MongoCursor<Document> cursor = collection.find().iterator()) {
+                while (cursor.hasNext()) {
+                    Document doc = cursor.next();
+                    // Extract name and score from each document
+                    String name = doc.getString("name");
+                    int score = doc.getInteger("score");
+                    // Create a Player object and add it to the list
+                    leaderboard.add(new PlayerModel(name, score));
+                }
+            }
+        }
+        leaderboard.sort(Comparator.comparingInt(PlayerModel::getScore));
+        return leaderboard;
+    }
 }
