@@ -23,12 +23,18 @@ import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
+import com.mongodb.client.MongoClient;
+import com.mongodb.client.MongoClients;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoCursor;
+import com.mongodb.client.MongoDatabase;
 import com.mygdx.infinitegolf.InputHandler;
 import com.mygdx.infinitegolf.gameobject.controller.ArrowController;
 import com.mygdx.infinitegolf.gameobject.controller.GolfBallController;
 import com.mygdx.infinitegolf.gameobject.controller.PowerBallController;
 import com.mygdx.infinitegolf.gameobject.model.ArrowModel;
 import com.mygdx.infinitegolf.gameobject.model.GolfBallModel;
+import com.mygdx.infinitegolf.gameobject.model.PlayerModel;
 import com.mygdx.infinitegolf.gameobject.model.PowerBallModel;
 import com.mygdx.infinitegolf.gameobject.view.ArrowView;
 import com.mygdx.infinitegolf.gameobject.view.GolfBallView;
@@ -36,6 +42,12 @@ import com.mygdx.infinitegolf.gameobject.view.GameObjectView;
 import com.mygdx.infinitegolf.gameobject.view.PowerBallView;
 import com.mygdx.infinitegolf.utils.Assets;
 
+import org.bson.Document;
+
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Scanner;
 import java.util.TreeMap;
 
 import Utils.TileObjectUtil;
@@ -303,7 +315,26 @@ public class Hole extends Scene {
     }
 
     private void endGame() {
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Enter your name to be added to the leaderboard: ");
+        String name = scanner.nextLine();
+        addScoreToDB(totalShotCounter, name);
+        printLeaderboard();
+        scanner.close();
         System.exit(0); //fixme end game screen
+    }
+
+    private void printLeaderboard() {
+        List<PlayerModel> leaderboard = getScoresFromDB();
+        System.out.println("LEADERBOARD:");
+        int counter = 1;
+        for (PlayerModel player : leaderboard) {
+            if (counter > 10) {
+                break;
+            }
+            System.out.println(counter + ": " + player.getName() + " - " + player.getScore());
+            counter++;
+        }
     }
 
     private boolean isBallStopped() {
@@ -382,4 +413,38 @@ public class Hole extends Scene {
         Assets.loadAll();
     }
 
+    private void addScoreToDB(int score, String name) {
+        @SuppressWarnings("AuthLeak") String uri = "mongodb+srv://InfiniteGolfDev:InfiniteGolfDev@cluster0.ilveng7.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
+        try (MongoClient mongoClient = MongoClients.create(uri)) {
+            MongoDatabase database = mongoClient.getDatabase("golfScores");
+            MongoCollection<Document> collection = database.getCollection("golfScores");
+            // Create a document with the number field
+            Document doc = new Document("name", name).append("score", score);
+            // Insert the document into the collection
+            collection.insertOne(doc);
+            System.out.println("Number inserted successfully.");
+        }
+    }
+
+    @SuppressWarnings("NewApi")
+    private List<PlayerModel> getScoresFromDB() {
+        @SuppressWarnings("AuthLeak") String uri = "mongodb+srv://InfiniteGolfDev:InfiniteGolfDev@cluster0.ilveng7.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
+        List<PlayerModel> leaderboard = new ArrayList<>();
+        try (MongoClient mongoClient = MongoClients.create(uri)) {
+            MongoDatabase database = mongoClient.getDatabase("golfScores");
+            MongoCollection<Document> collection = database.getCollection("golfScores");
+            try (MongoCursor<Document> cursor = collection.find().iterator()) {
+                while (cursor.hasNext()) {
+                    Document doc = cursor.next();
+                    // Extract name and score from each document
+                    String name = doc.getString("name");
+                    int score = doc.getInteger("score");
+                    // Create a Player object and add it to the list
+                    leaderboard.add(new PlayerModel(name, score));
+                }
+            }
+        }
+        leaderboard.sort(Comparator.comparingInt(PlayerModel::getScore));
+        return leaderboard;
+    }
 }
