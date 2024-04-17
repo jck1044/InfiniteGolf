@@ -46,7 +46,9 @@ import org.bson.Document;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 import java.util.TreeMap;
 
@@ -85,11 +87,12 @@ public class Hole extends Scene {
     private final float golfBallSize = 16;
     private Body golfBallBody;
     private Boolean isBallInHole = false;
-    private int holeNumber = 8;
+    private int holeNumber = 9;
     private boolean isPaused = false;
     private boolean playInHoleSoundOnce = false;
     private Sound hitSound;
     private Sound inHoleSound;
+    private HashMap<Integer, Integer> perHoleScore;
 
 
     public Hole(Game game, String mapFile) { // Need to add a parameter for the map file
@@ -134,6 +137,8 @@ public class Hole extends Scene {
         backgroundObjects = new Array<>();
         gameObjectViews = new TreeMap<>();
         dynamicGameObjects = new Array<>();
+
+        perHoleScore = new HashMap<>();
 
         Array<GameObjectView> playerViews = new Array<>();
         Array<GameObjectView> foregroundViews = new Array<>();
@@ -187,13 +192,7 @@ public class Hole extends Scene {
 
     @Override
     public void render(float dt) {
-        if (holeNumber == 9) {
-            endScreen = new EndScreen(this.game);
-            endScreen.initScene();
-            this.game.setScreen(endScreen);
-        } else {
-            this.updateScene(dt);
-        }
+        this.updateScene(dt);
     }
 
     public void pauseGame() {
@@ -303,39 +302,20 @@ public class Hole extends Scene {
         playInHoleSoundOnce = false;
         isBallInHole = false;
         totalShotCounter += holeShotCounter;
+        perHoleScore.put(holeNumber - 1, holeShotCounter);
         holeShotCounter = 0;
         arrowView.resetAngle();
-        if (holeNumber < 9) {
-            holeNumber++;
+        holeNumber++;
+        if (holeNumber == 10) {
+            endScreen = new EndScreen(this.game, perHoleScore);
+            endScreen.initScene();
+            this.game.setScreen(endScreen);
+        } else {
             this.mapFile = "Maps/Hole" + holeNumber + ".tmx";
             this.createHole();
-        } else {
-
         }
     }
 
-    private void endGame() {
-        Scanner scanner = new Scanner(System.in);
-        System.out.print("Enter your name to be added to the leaderboard: ");
-        String name = scanner.nextLine();
-        addScoreToDB(totalShotCounter, name);
-        printLeaderboard();
-        scanner.close();
-        System.exit(0); //fixme end game screen
-    }
-
-    private void printLeaderboard() {
-        List<PlayerModel> leaderboard = getScoresFromDB();
-        System.out.println("LEADERBOARD:");
-        int counter = 1;
-        for (PlayerModel player : leaderboard) {
-            if (counter > 10) {
-                break;
-            }
-            System.out.println(counter + ": " + player.getName() + " - " + player.getScore());
-            counter++;
-        }
-    }
 
     private boolean isBallStopped() {
         float speedThreshold = .015f;
@@ -411,40 +391,5 @@ public class Hole extends Scene {
         Assets.addTexture("Images/GolfBall.png");
         Assets.addTexture("Images/Arrow.png");
         Assets.loadAll();
-    }
-
-    private void addScoreToDB(int score, String name) {
-        @SuppressWarnings("AuthLeak") String uri = "mongodb+srv://InfiniteGolfDev:InfiniteGolfDev@cluster0.ilveng7.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
-        try (MongoClient mongoClient = MongoClients.create(uri)) {
-            MongoDatabase database = mongoClient.getDatabase("golfScores");
-            MongoCollection<Document> collection = database.getCollection("golfScores");
-            // Create a document with the number field
-            Document doc = new Document("name", name).append("score", score);
-            // Insert the document into the collection
-            collection.insertOne(doc);
-            System.out.println("Number inserted successfully.");
-        }
-    }
-
-    @SuppressWarnings("NewApi")
-    private List<PlayerModel> getScoresFromDB() {
-        @SuppressWarnings("AuthLeak") String uri = "mongodb+srv://InfiniteGolfDev:InfiniteGolfDev@cluster0.ilveng7.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
-        List<PlayerModel> leaderboard = new ArrayList<>();
-        try (MongoClient mongoClient = MongoClients.create(uri)) {
-            MongoDatabase database = mongoClient.getDatabase("golfScores");
-            MongoCollection<Document> collection = database.getCollection("golfScores");
-            try (MongoCursor<Document> cursor = collection.find().iterator()) {
-                while (cursor.hasNext()) {
-                    Document doc = cursor.next();
-                    // Extract name and score from each document
-                    String name = doc.getString("name");
-                    int score = doc.getInteger("score");
-                    // Create a Player object and add it to the list
-                    leaderboard.add(new PlayerModel(name, score));
-                }
-            }
-        }
-        leaderboard.sort(Comparator.comparingInt(PlayerModel::getScore));
-        return leaderboard;
     }
 }
