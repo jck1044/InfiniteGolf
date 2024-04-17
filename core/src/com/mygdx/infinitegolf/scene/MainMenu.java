@@ -57,8 +57,6 @@ public class MainMenu extends Scene {
         stage = new Stage(new StretchViewport(w, h));
         Gdx.input.setInputProcessor(stage);
 
-        skin = new Skin(Gdx.files.internal("Skins/uiskin.json"));
-
         Texture backgroundTexture = new Texture(Gdx.files.internal("Images/Menu.jpg"));
         Image backgroundImage = new Image(backgroundTexture);
         backgroundImage.setSize(w, h);
@@ -85,7 +83,7 @@ public class MainMenu extends Scene {
         TextureRegion quitButtonRegion = new TextureRegion(quitButtonTexture);
         ImageButton.ImageButtonStyle quitButtonStyle = new ImageButton.ImageButtonStyle();
         quitButtonStyle.imageUp = new TextureRegionDrawable(quitButtonRegion);
-        optionsButtonStyle.imageDown = new TextureRegionDrawable(quitButtonRegion);
+        quitButtonStyle.imageDown = new TextureRegionDrawable(quitButtonRegion);
         final ImageButton quitButton = new ImageButton(quitButtonStyle);
 
         float buttonWidth = 250;

@@ -68,10 +68,12 @@ public class Hole extends Scene {
 
     private Boolean powerUp = true;
 
+    private EndScreen endScreen;
+
     private final float golfBallSize = 16;
     private Body golfBallBody;
     private Boolean isBallInHole = false;
-    private int holeNumber = 1;
+    private int holeNumber = 8;
     private boolean isPaused = false;
     private boolean playInHoleSoundOnce = false;
     private Sound hitSound;
@@ -173,7 +175,13 @@ public class Hole extends Scene {
 
     @Override
     public void render(float dt) {
-        this.updateScene(dt);
+        if (holeNumber == 9) {
+            endScreen = new EndScreen(this.game);
+            endScreen.initScene();
+            this.game.setScreen(endScreen);
+        } else {
+            this.updateScene(dt);
+        }
     }
 
     public void pauseGame() {
@@ -191,8 +199,6 @@ public class Hole extends Scene {
         if (!isPaused) {
             tmr.render();
             batch.begin();
-
-
             if (!isBallInHole) {
                 golfBallController.updatePosition(golfBallBody);
                 if (isBallStopped()) {
@@ -292,7 +298,7 @@ public class Hole extends Scene {
             this.mapFile = "Maps/Hole" + holeNumber + ".tmx";
             this.createHole();
         } else {
-            endGame();
+
         }
     }
 

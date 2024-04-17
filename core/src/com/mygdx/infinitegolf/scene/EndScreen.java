@@ -1,6 +1,8 @@
 package com.mygdx.infinitegolf.scene;
 
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -19,7 +21,15 @@ import java.util.TreeMap;
 
 public class EndScreen extends Scene {
 
+    private Game game;
+
+    public EndScreen(Game game) {
+        this.game = game;
+    }
+
     private Stage stage;
+    private Music backgroundMusic;
+
     public void initScene() {
         Assets.init();
         this.loadAssets();
@@ -32,8 +42,44 @@ public class EndScreen extends Scene {
         batch = new SpriteBatch();
         gameObjectViews = new TreeMap<>();
 
+
+        backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal("Music/Menu.mp3"));
+        backgroundMusic.setLooping(true);
+        backgroundMusic.setVolume(0.5f);
+        backgroundMusic.play();
+
         stage = new Stage(new StretchViewport(w, h));
         Gdx.input.setInputProcessor(stage);
+
+        Texture backgroundTexture = new Texture(Gdx.files.internal("Images/Menu.jpg"));
+        Image backgroundImage = new Image(backgroundTexture);
+        backgroundImage.setSize(w, h);
+
+        Texture quitButtonTexture = new Texture(Gdx.files.internal("Images/QuitButton.png"));
+        TextureRegion quitButtonRegion = new TextureRegion(quitButtonTexture);
+        ImageButton.ImageButtonStyle quitButtonStyle = new ImageButton.ImageButtonStyle();
+        quitButtonStyle.imageUp = new TextureRegionDrawable(quitButtonRegion);
+        quitButtonStyle.imageDown = new TextureRegionDrawable(quitButtonRegion);
+        final ImageButton quitButton = new ImageButton(quitButtonStyle);
+
+        float buttonWidth = 250;
+        float buttonHeight = 200;
+
+        quitButton.setWidth(buttonWidth);
+        quitButton.setHeight(buttonHeight);
+
+        float centerX = w / 2f;
+        quitButton.setPosition(centerX - quitButton.getWidth() / 2f, 0);
+        quitButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                // Handle exit button click
+                Gdx.app.exit();
+            }
+        });
+
+        stage.addActor(backgroundImage);
+        stage.addActor(quitButton);
 
     }
 
