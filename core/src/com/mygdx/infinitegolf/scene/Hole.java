@@ -88,6 +88,7 @@ public class Hole extends Scene {
     private boolean playInHoleSoundOnce = false;
     private Sound hitSound;
     private Sound inHoleSound;
+    private Boolean isMute;
 
 
     public Hole(Game game, String mapFile) { // Need to add a parameter for the map file
@@ -221,7 +222,7 @@ public class Hole extends Scene {
                 }
                 font.draw(batch, String.valueOf(holeShotCounter), camera.viewportWidth / 2f + (camera.position.x - camera.viewportWidth / 2f), camera.viewportHeight / 2f + camera.position.y);
             } else {
-                if (!playInHoleSoundOnce) {
+                if (!playInHoleSoundOnce && !isMute) {
                     inHoleSound.play();
                     playInHoleSoundOnce = true;
                 }
@@ -371,8 +372,10 @@ public class Hole extends Scene {
     public void updateGolfBallPosition(float delta) {
         if (!Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
             if (powerBallController.getSize() > golfBallSize) {
-                float volume = powerBallController.getSize() / 100;
-                hitSound.play(volume);
+                if (!isMute) {
+                    float volume = powerBallController.getSize() / 100;
+                    hitSound.play(volume);
+                }
                 float horizontalForce = (90 - arrowController.getAngle()) * powerBallController.getSize() / 2.75f;
                 float verticalForce = getVerticalForce(arrowController.getAngle()) * powerBallController.getSize() / 2.75f;
                 golfBallBody.applyForceToCenter(horizontalForce, verticalForce, false);
@@ -405,6 +408,10 @@ public class Hole extends Scene {
         Assets.addTexture("Images/GolfBall.png");
         Assets.addTexture("Images/Arrow.png");
         Assets.loadAll();
+    }
+
+    public void setIsMute(Boolean isMute){
+        this.isMute = isMute;
     }
 
     private void addScoreToDB(int score, String name) {
