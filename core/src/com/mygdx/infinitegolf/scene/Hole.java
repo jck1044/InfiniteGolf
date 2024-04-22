@@ -46,7 +46,9 @@ import org.bson.Document;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 import java.util.TreeMap;
 
@@ -80,6 +82,8 @@ public class Hole extends Scene {
 
     private Boolean powerUp = true;
 
+    private EndScreen endScreen;
+
     private final float golfBallSize = 16;
     private Body golfBallBody;
     private Boolean isBallInHole = false;
@@ -89,6 +93,7 @@ public class Hole extends Scene {
     private Sound hitSound;
     private Sound inHoleSound;
     private Boolean isMute;
+    private HashMap<Integer, Integer> perHoleScore;
 
 
     public Hole(Game game, String mapFile) { // Need to add a parameter for the map file
@@ -133,6 +138,8 @@ public class Hole extends Scene {
         backgroundObjects = new Array<>();
         gameObjectViews = new TreeMap<>();
         dynamicGameObjects = new Array<>();
+
+        perHoleScore = new HashMap<>();
 
         Array<GameObjectView> playerViews = new Array<>();
         Array<GameObjectView> foregroundViews = new Array<>();
@@ -204,8 +211,6 @@ public class Hole extends Scene {
         if (!isPaused) {
             tmr.render();
             batch.begin();
-
-
             if (!isBallInHole) {
                 golfBallController.updatePosition(golfBallBody);
                 if (isBallStopped()) {
@@ -298,39 +303,20 @@ public class Hole extends Scene {
         playInHoleSoundOnce = false;
         isBallInHole = false;
         totalShotCounter += holeShotCounter;
+        perHoleScore.put(holeNumber - 1, holeShotCounter);
         holeShotCounter = 0;
         arrowView.resetAngle();
-        if (holeNumber < 9) {
-            holeNumber++;
+        holeNumber++;
+        if (holeNumber == 10) {
+            endScreen = new EndScreen(this.game, perHoleScore);
+            endScreen.initScene();
+            this.game.setScreen(endScreen);
+        } else {
             this.mapFile = "Maps/Hole" + holeNumber + ".tmx";
             this.createHole();
-        } else {
-            endGame();
         }
     }
 
-    private void endGame() {
-        Scanner scanner = new Scanner(System.in);
-        System.out.print("Enter your name to be added to the leaderboard: ");
-        String name = scanner.nextLine();
-        addScoreToDB(totalShotCounter, name);
-        printLeaderboard();
-        scanner.close();
-        System.exit(0); //fixme end game screen
-    }
-
-    private void printLeaderboard() {
-        List<PlayerModel> leaderboard = getScoresFromDB();
-        System.out.println("LEADERBOARD:");
-        int counter = 1;
-        for (PlayerModel player : leaderboard) {
-            if (counter > 10) {
-                break;
-            }
-            System.out.println(counter + ": " + player.getName() + " - " + player.getScore());
-            counter++;
-        }
-    }
 
     private boolean isBallStopped() {
         float speedThreshold = .015f;

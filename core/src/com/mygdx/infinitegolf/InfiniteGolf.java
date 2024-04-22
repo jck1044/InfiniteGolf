@@ -4,7 +4,7 @@ import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.mygdx.infinitegolf.scene.Hole;
-import com.mygdx.infinitegolf.scene.Menu;
+import com.mygdx.infinitegolf.scene.MainMenu;
 import com.mygdx.infinitegolf.utils.Assets;
 
 
@@ -12,12 +12,12 @@ public class InfiniteGolf extends Game {
     SpriteBatch batch;
     private Hole hole;
 
-    private Menu menu;
+    private MainMenu menu;
 
     @Override
     public void create() {
         Assets.init();
-        menu = new Menu(this);
+        menu = new MainMenu(this);
         menu.initScene();
         setScreen(menu);
     }
