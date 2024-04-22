@@ -87,7 +87,7 @@ public class Hole extends Scene {
     private final float golfBallSize = 16;
     private Body golfBallBody;
     private Boolean isBallInHole = false;
-    private int holeNumber = 9;
+    private int holeNumber = 1;
     private boolean isPaused = false;
     private boolean playInHoleSoundOnce = false;
     private Sound hitSound;

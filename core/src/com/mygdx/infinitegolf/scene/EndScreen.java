@@ -95,17 +95,11 @@ public class EndScreen extends Scene {
 
 
         HashMap<Integer, Integer> mockScore = new HashMap<>();
-        mockScore.put(0, 3);
-        mockScore.put(1, 2);
-        mockScore.put(2, 4);
-        mockScore.put(3, 1);
-        mockScore.put(4, 5);
-        mockScore.put(5, 7);
-        mockScore.put(6, 3);
-        mockScore.put(7, 2);
-        mockScore.put(8, 3);
-
-
+        int total = 0;
+        for (int i = 0; i < perHoleScore.size(); i++) {
+            mockScore.put(i, perHoleScore.get(i));
+            total += perHoleScore.get(i);
+        }
 
         Table scorecardTable = new Table();
         Pixmap bgPixmap = new Pixmap(1,1, Pixmap.Format.RGB565);
@@ -125,6 +119,10 @@ public class EndScreen extends Scene {
             holeLabel.setFontScale(2f);
             scorecardTable.add(holeLabel).pad(5);
         }
+        Label holeLabel = new Label("TOTAL", new Label.LabelStyle(font, Color.RED));
+        holeLabel.setColor(Color.RED); // Set label text color
+        holeLabel.setFontScale(2f);
+        scorecardTable.add(holeLabel).pad(5);
         scorecardTable.row();
         Label scoreHeader = new Label("Score", new Label.LabelStyle(font, Color.BLACK));
         scoreHeader.setFontScale(2f);
@@ -135,10 +133,13 @@ public class EndScreen extends Scene {
             scoreLabel.setFontScale(2f);
             scorecardTable.add(scoreLabel).pad(5);
         }
-
+        Label scoreLabel = new Label(String.valueOf(total), new Label.LabelStyle(font, Color.RED));
+        scoreLabel.setColor(Color.RED); // Set label text color
+        scoreLabel.setFontScale(2f);
+        scorecardTable.add(scoreLabel).pad(5);
 
         float centerX = w / 2f;
-        float tableWidth = 400;
+        float tableWidth = 450;
         float tableHeight = 150;
         scorecardTable.setWidth(tableWidth);
         scorecardTable.setHeight(tableHeight);
