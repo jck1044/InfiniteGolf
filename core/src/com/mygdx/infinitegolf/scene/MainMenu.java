@@ -30,6 +30,7 @@ public class MainMenu extends Scene {
     private Music backgroundMusic;
 
     private Texture titleTexture;
+    private Boolean isMute = false;
 
     public MainMenu(Game game) {
         this.game = game;
@@ -62,7 +63,7 @@ public class MainMenu extends Scene {
         backgroundImage.setSize(w, h);
 
         titleTexture = new Texture(Gdx.files.internal("Images/Title.png"));
-        Image titleImage = new Image (titleTexture);
+        Image titleImage = new Image(titleTexture);
         titleImage.setSize(750, 100);
 
         Texture playButtonTexture = new Texture(Gdx.files.internal("Images/PlayButton.png"));
@@ -72,13 +73,6 @@ public class MainMenu extends Scene {
         playButtonStyle.imageDown = new TextureRegionDrawable(playButtonRegion);
         final ImageButton playButton = new ImageButton(playButtonStyle);
 
-        Texture optionsButtonTexture = new Texture(Gdx.files.internal("Images/OptionsButton.png"));
-        TextureRegion optionsButtonRegion = new TextureRegion(optionsButtonTexture);
-        ImageButton.ImageButtonStyle optionsButtonStyle = new ImageButton.ImageButtonStyle();
-        optionsButtonStyle.imageUp = new TextureRegionDrawable(optionsButtonRegion);
-        optionsButtonStyle.imageDown = new TextureRegionDrawable(optionsButtonRegion);
-        final ImageButton optionsButton = new ImageButton(optionsButtonStyle);
-
         Texture quitButtonTexture = new Texture(Gdx.files.internal("Images/QuitButton.png"));
         TextureRegion quitButtonRegion = new TextureRegion(quitButtonTexture);
         ImageButton.ImageButtonStyle quitButtonStyle = new ImageButton.ImageButtonStyle();
@@ -86,21 +80,34 @@ public class MainMenu extends Scene {
         quitButtonStyle.imageDown = new TextureRegionDrawable(quitButtonRegion);
         final ImageButton quitButton = new ImageButton(quitButtonStyle);
 
+        Texture blueTexture = new Texture(Gdx.files.internal("Images/blue.png"));
+        final Image blueImage = new Image(blueTexture);
+
+        Texture volumeButtonTexture = new Texture(Gdx.files.internal("Images/volume.png"));
+        TextureRegion volumeButtonRegion = new TextureRegion(volumeButtonTexture);
+        ImageButton.ImageButtonStyle volumeButtonStyle = new ImageButton.ImageButtonStyle();
+        volumeButtonStyle.imageUp = new TextureRegionDrawable(volumeButtonRegion);
+        volumeButtonStyle.imageDown = new TextureRegionDrawable(volumeButtonRegion);
+        final ImageButton volumeButton = new ImageButton(volumeButtonStyle);
+
         float buttonWidth = 250;
         float buttonHeight = 200;
         playButton.setWidth(buttonWidth);
         playButton.setHeight(buttonHeight);
-        optionsButton.setWidth(buttonWidth);
-        optionsButton.setHeight(buttonHeight);
         quitButton.setWidth(buttonWidth);
         quitButton.setHeight(buttonHeight);
+        blueImage.setWidth(125);
+        blueImage.setHeight(125);
+        volumeButton.setWidth(125);
+        volumeButton.setHeight(125);
 
         float centerX = w / 2f;
 
         titleImage.setPosition(centerX - titleImage.getWidth() / 2f, 500);
-        playButton.setPosition(centerX - playButton.getWidth() / 2f, 300);
-        optionsButton.setPosition(centerX - optionsButton.getWidth() / 2f, 150);
-        quitButton.setPosition(centerX - quitButton.getWidth() / 2f, 0);
+        playButton.setPosition(centerX - playButton.getWidth() / 2f, 275);
+        quitButton.setPosition(centerX - quitButton.getWidth() / 2f, 100);
+        volumeButton.setPosition(0, 0);
+        blueImage.setPosition(0, 0);
 
 
         // Add listeners to buttons
@@ -109,16 +116,13 @@ public class MainMenu extends Scene {
             public void clicked(InputEvent event, float x, float y) {
                 hole = new Hole(game, "Maps/Hole1.tmx");
                 hole.initScene();
+                hole.setIsMute(isMute);
                 game.setScreen(hole);
-                backgroundMusic.setVolume(0.25f);
-            }
-        });
-
-        optionsButton.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                // Handle options button click
-                // You can show options screen here
+                if (isMute) {
+                    backgroundMusic.setVolume(0);
+                } else {
+                    backgroundMusic.setVolume(0.25f);
+                }
             }
         });
 
@@ -130,11 +134,28 @@ public class MainMenu extends Scene {
             }
         });
 
+        volumeButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                if (!isMute) {
+                    Texture muteButtonTexture = new Texture(Gdx.files.internal("Images/mute.png"));
+                    volumeButtonRegion.setTexture(muteButtonTexture);
+                    backgroundMusic.setVolume(0);
+                } else {
+                    Texture volumeButtonTexture = new Texture(Gdx.files.internal("Images/volume.png"));
+                    volumeButtonRegion.setTexture(volumeButtonTexture);
+                    backgroundMusic.setVolume(0.5f);
+                }
+                isMute = !isMute;
+            }
+        });
+
         stage.addActor(backgroundImage);
         stage.addActor(titleImage);
         stage.addActor(playButton);
-        stage.addActor(optionsButton);
         stage.addActor(quitButton);
+        stage.addActor(blueImage);
+        stage.addActor(volumeButton);
 
     }
 

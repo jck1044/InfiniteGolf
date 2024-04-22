@@ -92,6 +92,7 @@ public class Hole extends Scene {
     private boolean playInHoleSoundOnce = false;
     private Sound hitSound;
     private Sound inHoleSound;
+    private Boolean isMute;
     private HashMap<Integer, Integer> perHoleScore;
 
 
@@ -226,7 +227,7 @@ public class Hole extends Scene {
                 }
                 font.draw(batch, String.valueOf(holeShotCounter), camera.viewportWidth / 2f + (camera.position.x - camera.viewportWidth / 2f), camera.viewportHeight / 2f + camera.position.y);
             } else {
-                if (!playInHoleSoundOnce) {
+                if (!playInHoleSoundOnce && !isMute) {
                     inHoleSound.play();
                     playInHoleSoundOnce = true;
                 }
@@ -357,8 +358,10 @@ public class Hole extends Scene {
     public void updateGolfBallPosition(float delta) {
         if (!Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
             if (powerBallController.getSize() > golfBallSize) {
-                float volume = powerBallController.getSize() / 100;
-                hitSound.play(volume);
+                if (!isMute) {
+                    float volume = powerBallController.getSize() / 100;
+                    hitSound.play(volume);
+                }
                 float horizontalForce = (90 - arrowController.getAngle()) * powerBallController.getSize() / 2.75f;
                 float verticalForce = getVerticalForce(arrowController.getAngle()) * powerBallController.getSize() / 2.75f;
                 golfBallBody.applyForceToCenter(horizontalForce, verticalForce, false);
@@ -391,5 +394,44 @@ public class Hole extends Scene {
         Assets.addTexture("Images/GolfBall.png");
         Assets.addTexture("Images/Arrow.png");
         Assets.loadAll();
+    }
+
+    public void setIsMute(Boolean isMute){
+        this.isMute = isMute;
+    }
+
+    private void addScoreToDB(int score, String name) {
+        @SuppressWarnings("AuthLeak") String uri = "mongodb+srv://InfiniteGolfDev:InfiniteGolfDev@cluster0.ilveng7.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
+        try (MongoClient mongoClient = MongoClients.create(uri)) {
+            MongoDatabase database = mongoClient.getDatabase("golfScores");
+            MongoCollection<Document> collection = database.getCollection("golfScores");
+            // Create a document with the number field
+            Document doc = new Document("name", name).append("score", score);
+            // Insert the document into the collection
+            collection.insertOne(doc);
+            System.out.println("Number inserted successfully.");
+        }
+    }
+
+    @SuppressWarnings("NewApi")
+    private List<PlayerModel> getScoresFromDB() {
+        @SuppressWarnings("AuthLeak") String uri = "mongodb+srv://InfiniteGolfDev:InfiniteGolfDev@cluster0.ilveng7.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
+        List<PlayerModel> leaderboard = new ArrayList<>();
+        try (MongoClient mongoClient = MongoClients.create(uri)) {
+            MongoDatabase database = mongoClient.getDatabase("golfScores");
+            MongoCollection<Document> collection = database.getCollection("golfScores");
+            try (MongoCursor<Document> cursor = collection.find().iterator()) {
+                while (cursor.hasNext()) {
+                    Document doc = cursor.next();
+                    // Extract name and score from each document
+                    String name = doc.getString("name");
+                    int score = doc.getInteger("score");
+                    // Create a Player object and add it to the list
+                    leaderboard.add(new PlayerModel(name, score));
+                }
+            }
+        }
+        leaderboard.sort(Comparator.comparingInt(PlayerModel::getScore));
+        return leaderboard;
     }
 }
